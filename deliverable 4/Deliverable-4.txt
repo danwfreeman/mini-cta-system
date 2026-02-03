@@ -1,0 +1,9 @@
+Deliverable #4
+4th Deliverable (Write and test a simple program/application)
+
+Write a program in a programming language that SQL supports to implement basic 
+Create, Read, Update, and Delete (CRUD) operations, which encompass adding, reading, modifying, and deleting database records. 
+The program or application must be developed using Python, Java, or C/C++, and it can be web-based, a desktop application, or a command-line tool. 
+The application's functionality should be demonstrated through a video recording via Loom.
+
+Loom instructions can be accessed here:

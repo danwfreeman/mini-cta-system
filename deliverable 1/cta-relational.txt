@@ -1,0 +1,232 @@
+Relational Schema:
+
+
+Line(lineID PK, name, mode)
+
+Station(stationID PK, name, mode, isAccessible)
+
+StationLine(stationID FK, lineID, stopSequence)
+
+TimeTable(timetableID PK, lineID, stationID, dayType, timeOfDay, direction)
+
+Fare(fareID PK, fareCategory, riderCategory, price) 
+
+Alert(alertID PK, title, description, startTime, endTime, severity )
+
+AlertLine(alertID PK, lineID PK)
+
+AlertStation(alertID PK, stationID PK)
+
+
+Schema Detailed Types:
+
+Line:
+
+lineID INT PK NOT NULL
+
+name VARCHAR(100)
+
+mode ENUM('bus','train')
+
+
+Station:
+
+stationID INT PK NOT NULL
+
+name VARCHAR(150)
+
+mode ENUM('bus','train')
+
+isAccessible BOOLEAN
+
+
+StationLine:
+
+stationID INT FK NOT NULL
+
+lineID INT FK NOT NULL
+
+stopSequence SMALLINT NOT NULL
+
+PK(stationID, lineID)
+
+
+TimeTable:
+
+timetableID INT PK NOT NULL
+
+lineID INT FK NOT NULL
+
+stationID INT FK NOT NULL
+
+dayType ENUM('weekday','saturday','sunday_holiday') 
+
+timeOfDay TIME NOT NULL
+
+direction ENUM('northbound','southbound','eastbound','westbound')
+
+
+Fare:
+
+fareID INT PK NOT NULL
+
+fareCategory VARCHAR(60)
+
+riderCategory ENUM('regular','reduced','student')
+
+price DECIMAL(6,2) NOT NULL
+
+
+Alert:
+
+alertID INT PK NOT NULL
+
+title VARCHAR(150)
+
+description TEXT NOT NULL
+
+startTime DATETIME NOT NULL
+
+endTime DATETIME NOT NULL
+
+severity ENUM('info','minor','major','critical')
+
+
+
+AlertLine:
+
+alertID INT PK NOT NULL
+
+lineID INT PK NOT NULL
+
+
+AlertStation:
+
+alertID INT PK NOT NULL
+
+stationID INT PK NOT NULL
+
+
+
+
+
+
+
+
+Data Identification and Semantics:
+
+Fare: Describes the cost of using the CTA service
+fareCategory is for different service types 'L', bus, transfer, or passes: 1 day, 3 day, etc. Other fares are: L to O'Hare, or pay by 'cash on the bus'
+riderCategory would be: regular (most common), reduced (golden age or disability) and student
+price is the amount given the fareCategory and riderCategory
+
+Alert, AlertLine, AlertStation: a note that is applied to either one or many L lines one or many bus line, or one or many stations. 
+an alert can also not apply to any of the lines or stations and can be system wide
+for a station alert, a typical use case would an out of service elevator 
+an alert can apply to many lines and a line can have many alerts (AlertLine)
+an alert can apply to many stations and a station can have many alerts (AlertStation)
+
+Line: is either a L (train) line or a bus line.  The mode attribute designates each as an enumeration: (Train, Bus)
+
+Station, StationLine: applies to either a train station or a bus stop, the mode attribute designates each as an enumeration: (Train, Bus)
+if station can accomodate a wheelchair it's designated as isAccessible=true
+a station can be used by more than one line, ie the red line and brown line (plus others) pass through the Clark/Lake station
+a line can have many stations and a station can have many lines (StationLine)
+
+TimeTable: a list of times for pickup at each station for each line
+the times change based on direction, a line can only have 2 directions either (NorthBound or SouthBound) or similarly (EastBound or WestBound)
+the dayType describes: weekdays, Saturday or Sunday/Holiday as each respective dayType has it's own schedule
+timeOfDay is the actual time the services will be at the respective station, ie 3:55pm
+
+
+
+Relationships and Constraints:
+
+
+For any specific Line at a specific Station there is a stopSequence which signifies the order of the stop on the line.
+stopSequence: order is from top to bottom, or left to right, as one would view the entire line on a map
+
+Uniqueness constraints:
+StationLine: Unique(lineID, stopSequence): a line cannot have 2 stops with the same stopSequence
+TimeTable: Unique(lineID, stationID, dayType, direction, timeOfDay):  cannot of 2 time entries a specific, lineID, stationID, dayType, direction
+
+Not Null constraints:
+All Primary Keys are Not Null
+All Foriegn Keys are Not Null
+
+Alert:
+An alert is considered systemwide when it has no associated records in either AlertLine or AlertStation.
+In this case, the alert applies globally across all lines and stations.
+
+
+Foreign Key Constraints:
+AlertLine.alertID
+AlertLine.lineID
+ Each AlertLine row must reference exactly one Alert and one Line
+
+AlertStation.alertID
+AlertStation.stationID
+Each AlertStation row must reference exactly one Alert and one Station
+
+TimeTable.lineID
+TimeTable.stationID
+ Each TimeTable row must reference one Line and one Station
+
+StationLine.lineID
+StationLine.stationID
+ Each StationLine row must reference one Station and one Line
+
+Fare: even though fareCategory values repeat, the relation is still in 3NF because all non-key attributes 
+are fully functionally dependent on the primary key - there are no transitive dependencies
+
+User Needs and Use Cases:
+
+Summary:
+
+The system supports riders of the Chicago metropolitan train and bus network, as well as CTA operational staff responsible for monitoring and responding to service alerts. Riders can plan trips by viewing bus and train schedules, understanding applicable fare prices, and determining which fare category applies to their rider type.
+The system provides fare information for different rider categories and fare types, such as student fares and monthly passes. Riders are also informed of service disruptions, including systemwide outages, station-specific issues (such as non-working elevators), and train delays.
+Together, this information enables riders to plan trips from point A to point B using a combination of trains and buses, while ensuring accessibility requirements are met and understanding expected travel time.
+
+Main Use Cases:
+
+Arrival Times at a Station:
+A user selects a station, line, direction, and day type to view scheduled arrival times.
+citation: Red Line Clark/Division station https://www.transitchicago.com/traintracker/arrivaltimes/?sid=40630
+
+Accessiblilty alerts:
+A user views all stations with elevator alerts:
+citation: https://www.transitchicago.com/alerts/elevators/
+
+Fare Prices:
+A user checks the fare price for a specific ride type and rider category before travel.
+citation: shows a fare breakdown on ategory and rider type:  https://www.transitchicago.com/fares/
+
+Alerts:
+A user views all active alerts affecting a specific station or line prior to planning a trip.
+citation: shows alerts for lines or general alerts: https://www.transitchicago.com/alerts/
+
+Line Overview Map:
+A user views the ordered sequence of stations for a selected line to understand the route layout.
+citation: shows a 'route diagram': https://www.transitchicago.com/blueline/
+
+Trip Planning:
+A user enters an origin station, destination station, and desired arrival or departure time, and the system generates one or more trip options, which may include train service, bus service, or a combination of both, along with estimated arrival times.
+citation: note, delegated ui work to google maps, but the CTA and this system holds the record of truth: https://www.transitchicago.com/planatrip/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 

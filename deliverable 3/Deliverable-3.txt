@@ -1,0 +1,12 @@
+Deliverable #3
+3rd Deliverable (Test a variety of SQL queries)
+
+Test a variety of SQL queries of your choice on your database. 
+Additional points will be awarded for queries derived from interesting use cases. 
+Ensure that you test at least 15 different (including advanced window features, and OLAP) queries and provide: 
+1) the query explanation/description,
+ 2) the SQL statement/commands, and 
+ 3) the output/result for each query.
+
+Save all of your working files into a single zipped folder and upload it below. 
+(You can provide screenshots for your outputs.)

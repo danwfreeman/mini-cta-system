@@ -1,0 +1,77 @@
+mysql> CREATE OR REPLACE VIEW v_line_schedule AS
+    -> SELECT
+    ->   l.lineID,
+    ->   l.name AS lineName,
+    ->   l.mode AS lineMode,
+    ->   tt.stationID,
+    ->   s.name AS stationName,
+    ->   tt.dayType,
+    ->   tt.direction,
+    ->   tt.timeOfDay
+    -> FROM TimeTable tt
+    -> JOIN Line l    ON l.lineID = tt.lineID
+    -> JOIN Station s ON s.stationID = tt.stationID;
+Query OK, 0 rows affected (0.009 sec)
+
+mysql> 
+mysql> 
+mysql> -- Active alerts (right now)
+Query OK, 0 rows affected (0.000 sec)
+
+mysql> CREATE OR REPLACE VIEW v_active_alerts AS
+    -> SELECT
+    ->   alertID,
+    ->   title,
+    ->   description,
+    ->   startTime,
+    ->   endTime,
+    ->   severity
+    -> FROM Alert
+    -> WHERE NOW() BETWEEN startTime AND endTime;
+Query OK, 0 rows affected (0.001 sec)
+
+mysql> 
+mysql> -- Alerts by line (line name + alert details)
+Query OK, 0 rows affected (0.000 sec)
+
+mysql> CREATE OR REPLACE VIEW v_alerts_by_line AS
+    -> SELECT
+    ->   l.lineID,
+    ->   l.name AS lineName,
+    ->   a.alertID,
+    ->   a.title,
+    ->   a.severity,
+    ->   a.startTime,
+    ->   a.endTime
+    -> FROM AlertLine al
+    -> JOIN Line  l ON l.lineID = al.lineID
+    -> JOIN Alert a ON a.alertID = al.alertID;
+Query OK, 0 rows affected (0.001 sec)
+
+mysql> 
+mysql> -- Line stops - ordered (line name + station name + accessibility)
+Query OK, 0 rows affected (0.000 sec)
+
+mysql> CREATE OR REPLACE VIEW v_line_stops AS
+    -> SELECT
+    ->   l.lineID,
+    ->   l.name AS lineName,
+    ->   sl.stopSequence,
+    ->   s.stationID,
+    ->   s.name AS stationName,
+    ->   s.isAccessible
+    -> FROM StationLine sl
+    -> JOIN Line l    ON l.lineID = sl.lineID
+    -> JOIN Station s ON s.stationID = sl.stationID;
+Query OK, 0 rows affected (0.001 sec)
+
+mysql> SHOW FULL TABLES WHERE TABLE_TYPE = 'VIEW';
++-----------------------+------------+
+| Tables_in_chicago_cta | Table_type |
++-----------------------+------------+
+| v_active_alerts       | VIEW       |
+| v_alerts_by_line      | VIEW       |
+| v_line_schedule       | VIEW       |
+| v_line_stops          | VIEW       |
++-----------------------+------------+
+4 rows in set (0.003 sec)

@@ -1,0 +1,43 @@
+mysql> -- since we call this often to get the maps of the lines in the UI, we want to offload the ordering of the sequence to the database
+Query OK, 0 rows affected (0.000 sec)
+
+mysql> DELIMITER $$
+mysql> 
+mysql> CREATE PROCEDURE sp_get_ordered_line_stops_by_line_name (
+    ->   IN p_lineName VARCHAR(100)
+    -> )
+    -> BEGIN
+    ->   SELECT
+    ->     l.lineID,
+    ->     l.name AS lineName,
+    ->     l.mode AS lineMode,
+    ->     sl.stopSequence,
+    ->     s.stationID,
+    ->     s.name AS stationName,
+    ->     s.isAccessible
+    ->   FROM Line l
+    ->   JOIN StationLine sl ON sl.lineID = l.lineID
+    ->   JOIN Station s      ON s.stationID = sl.stationID
+    ->   WHERE l.name = p_lineName
+    ->   ORDER BY sl.stopSequence;
+    -> END$$
+Query OK, 0 rows affected (0.007 sec)
+
+mysql> 
+mysql> DELIMITER ;
+mysql> -- use the stored procedure
+Query OK, 0 rows affected (0.000 sec)
+
+mysql> CALL sp_get_ordered_line_stops_by_line_name('Red Line');
++--------+----------+----------+--------------+-----------+---------------+--------------+
+| lineID | lineName | lineMode | stopSequence | stationID | stationName   | isAccessible |
++--------+----------+----------+--------------+-----------+---------------+--------------+
+|      1 | Red Line | train    |            1 |      1001 | Howard        |            1 |
+|      1 | Red Line | train    |            2 |      1002 | Belmont       |            1 |
+|      1 | Red Line | train    |            3 |      1003 | Fullerton     |            1 |
+|      1 | Red Line | train    |            4 |      1004 | Jackson       |            1 |
+|      1 | Red Line | train    |            5 |      1008 | 95th/Dan Ryan |            1 |
++--------+----------+----------+--------------+-----------+---------------+--------------+
+5 rows in set (0.004 sec)
+
+Query OK, 0 rows affected (0.004 sec)

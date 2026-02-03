@@ -1,0 +1,26 @@
+1st Deliverable (
+Design a relational database) 
+
+Design a relational database consisting of the most essential information required for your selected application. 
+Explore the website of the selected application to identify the relevant data, relationships, 
+semantics, constraints, users, and users’ needs, and interesting use cases 
+(a use case is a description of how a user might interact with a database, system, or process to achieve a specific goal
+ or perform a particular task). Represent your design using the Entity relationship
+  - Diagram (ERD). Make sure your ERD consists of between 6 to 8 entities. 
+  Reduce your ERD into relation schemas to represent the database at the logical level. 
+
+See example of the relational schema that can be extracted from the [F1 official website: 
+F1 - The Official Home of Formula 1® Racing
+]. Additionally, relationships, constraints, and user use cases can be found on the website.
+
+Relation schema (showing relations/entities and attributes)
+
+Driver (DriverID, TeamID, Country, Podiums, Points, GrandsPrixEntered,WorldChampionships, HighestRaceFinish, HighestGridPosition, DateofBirth, PlaceofBirth)
+
+Team (TeamID, Base, TeamChief, TechnicalChief, Chassis, PowerUnit, FirstTeamEntry, WorldChampionships, HighestRaceFinish, PolePositions, Fastest Laps)
+
+Race (RaceID, Position, Number, DriverID, Car, Laps, Time/retired, Points)
+
+Compile your work into one Word document and upload the file to this assignment page. 
+
+Note: If you do not know how to create a relational database or a relation schema, it is highly recommended you take the courses on Introduction to Relational Databases and Relational Database Design first.

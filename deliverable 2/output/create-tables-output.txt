@@ -1,0 +1,208 @@
+
+
+mysql> CREATE TABLE Line (
+    ->   lineID INT NOT NULL,
+    ->   name VARCHAR(100),
+    ->   mode ENUM('bus','train'),
+    ->   PRIMARY KEY (lineID)
+    -> ) ENGINE=InnoDB;
+Query OK, 0 rows affected (0.010 sec)
+
+mysql> CREATE TABLE Station (
+    ->   stationID INT NOT NULL,
+    ->   name VARCHAR(150),
+    ->   mode ENUM('bus','train'),
+    ->   isAccessible BOOLEAN,
+    ->   PRIMARY KEY (stationID)
+    -> ) ENGINE=InnoDB;
+Query OK, 0 rows affected (0.004 sec)
+
+mysql> 
+mysql> CREATE TABLE StationLine (
+    ->   stationID INT NOT NULL,
+    ->   lineID INT NOT NULL,
+    ->   stopSequence SMALLINT NOT NULL,
+    ->   PRIMARY KEY (stationID, lineID),
+    ->   CONSTRAINT fk_stationline_station
+    ->     FOREIGN KEY (stationID) REFERENCES Station(stationID)
+    ->     ON UPDATE CASCADE
+    ->     ON DELETE CASCADE,
+    ->   CONSTRAINT fk_stationline_line
+    ->     FOREIGN KEY (lineID) REFERENCES Line(lineID)
+    ->     ON UPDATE CASCADE
+    ->     ON DELETE CASCADE
+    -> ) ENGINE=InnoDB;
+Query OK, 0 rows affected (0.008 sec)
+
+mysql> 
+mysql> CREATE TABLE TimeTable (
+    ->   timetableID INT NOT NULL,
+    ->   lineID INT NOT NULL,
+    ->   stationID INT NOT NULL,
+    ->   dayType ENUM('weekday','saturday','sunday_holiday'),
+    ->   timeOfDay TIME NOT NULL,
+    ->   direction ENUM('northbound','southbound','eastbound','westbound'),
+    ->   PRIMARY KEY (timetableID),
+    ->   CONSTRAINT fk_timetable_line
+    ->     FOREIGN KEY (lineID) REFERENCES Line(lineID)
+    ->     ON UPDATE CASCADE
+    ->     ON DELETE RESTRICT,
+    ->   CONSTRAINT fk_timetable_station
+    ->     FOREIGN KEY (stationID) REFERENCES Station(stationID)
+    ->     ON UPDATE CASCADE
+    ->     ON DELETE RESTRICT
+    -> ) ENGINE=InnoDB;
+Query OK, 0 rows affected (0.011 sec)
+
+mysql> CREATE TABLE Fare (
+    ->   fareID INT NOT NULL,
+    ->   fareCategory VARCHAR(60),
+    ->   riderCategory ENUM('regular','reduced','student'),
+    ->   price DECIMAL(6,2) NOT NULL,
+    ->   PRIMARY KEY (fareID)
+    -> ) ENGINE=InnoDB;
+Query OK, 0 rows affected (0.008 sec)
+
+mysql> 
+mysql> CREATE TABLE Alert (
+    ->   alertID INT NOT NULL,
+    ->   title VARCHAR(150),
+    ->   description TEXT NOT NULL,
+    ->   startTime DATETIME NOT NULL,
+    ->   endTime DATETIME NOT NULL,
+    ->   severity ENUM('info','minor','major','critical'),
+    ->   PRIMARY KEY (alertID)
+    -> ) ENGINE=InnoDB;
+Query OK, 0 rows affected (0.007 sec)
+
+mysql> CREATE TABLE AlertLine (
+    ->   alertID INT NOT NULL,
+    ->   lineID INT NOT NULL,
+    ->   PRIMARY KEY (alertID, lineID),
+    ->   CONSTRAINT fk_alertline_alert
+    ->     FOREIGN KEY (alertID) REFERENCES Alert(alertID)
+    ->     ON UPDATE CASCADE
+    ->     ON DELETE CASCADE,
+    ->   CONSTRAINT fk_alertline_line
+    ->     FOREIGN KEY (lineID) REFERENCES Line(lineID)
+    ->     ON UPDATE CASCADE
+    ->     ON DELETE CASCADE
+    -> ) ENGINE=InnoDB;
+Query OK, 0 rows affected (0.009 sec)
+
+mysql> 
+mysql> CREATE TABLE AlertStation (
+    ->   alertID INT NOT NULL,
+    ->   stationID INT NOT NULL,
+    ->   PRIMARY KEY (alertID, stationID),
+    ->   CONSTRAINT fk_alertstation_alert
+    ->     FOREIGN KEY (alertID) REFERENCES Alert(alertID)
+    ->     ON UPDATE CASCADE
+    ->     ON DELETE CASCADE,
+    ->   CONSTRAINT fk_alertstation_station
+    ->     FOREIGN KEY (stationID) REFERENCES Station(stationID)
+    ->     ON UPDATE CASCADE
+    ->     ON DELETE CASCADE
+    -> ) ENGINE=InnoDB;
+Query OK, 0 rows affected (0.010 sec)
+
+mysql> show tables;
++-----------------------+
+| Tables_in_chicago_cta |
++-----------------------+
+| Alert                 |
+| AlertLine             |
+| AlertStation          |
+| Fare                  |
+| Line                  |
+| Station               |
+| StationLine           |
+| TimeTable             |
++-----------------------+
+8 rows in set (0.002 sec)
+
+
+mysql> describe Alert;
++-------------+-----------------------------------------+------+-----+---------+-------+
+| Field       | Type                                    | Null | Key | Default | Extra |
++-------------+-----------------------------------------+------+-----+---------+-------+
+| alertID     | int                                     | NO   | PRI | NULL    |       |
+| title       | varchar(150)                            | YES  |     | NULL    |       |
+| description | text                                    | NO   |     | NULL    |       |
+| startTime   | datetime                                | NO   |     | NULL    |       |
+| endTime     | datetime                                | NO   |     | NULL    |       |
+| severity    | enum('info','minor','major','critical') | YES  |     | NULL    |       |
++-------------+-----------------------------------------+------+-----+---------+-------+
+6 rows in set (0.002 sec)
+
+mysql> describe AlertLine;
++---------+------+------+-----+---------+-------+
+| Field   | Type | Null | Key | Default | Extra |
++---------+------+------+-----+---------+-------+
+| alertID | int  | NO   | PRI | NULL    |       |
+| lineID  | int  | NO   | PRI | NULL    |       |
++---------+------+------+-----+---------+-------+
+2 rows in set (0.002 sec)
+
+mysql> describe AlertStation;
++-----------+------+------+-----+---------+-------+
+| Field     | Type | Null | Key | Default | Extra |
++-----------+------+------+-----+---------+-------+
+| alertID   | int  | NO   | PRI | NULL    |       |
+| stationID | int  | NO   | PRI | NULL    |       |
++-----------+------+------+-----+---------+-------+
+2 rows in set (0.001 sec)
+
+mysql> describe Fare;
++---------------+-------------------------------------+------+-----+---------+-------+
+| Field         | Type                                | Null | Key | Default | Extra |
++---------------+-------------------------------------+------+-----+---------+-------+
+| fareID        | int                                 | NO   | PRI | NULL    |       |
+| fareCategory  | varchar(60)                         | YES  |     | NULL    |       |
+| riderCategory | enum('regular','reduced','student') | YES  |     | NULL    |       |
+| price         | decimal(6,2)                        | NO   |     | NULL    |       |
++---------------+-------------------------------------+------+-----+---------+-------+
+4 rows in set (0.002 sec)
+
+mysql> describe Line;
++--------+---------------------+------+-----+---------+-------+
+| Field  | Type                | Null | Key | Default | Extra |
++--------+---------------------+------+-----+---------+-------+
+| lineID | int                 | NO   | PRI | NULL    |       |
+| name   | varchar(100)        | YES  |     | NULL    |       |
+| mode   | enum('bus','train') | YES  |     | NULL    |       |
++--------+---------------------+------+-----+---------+-------+
+3 rows in set (0.002 sec)
+
+mysql> describe Station;
++--------------+---------------------+------+-----+---------+-------+
+| Field        | Type                | Null | Key | Default | Extra |
++--------------+---------------------+------+-----+---------+-------+
+| stationID    | int                 | NO   | PRI | NULL    |       |
+| name         | varchar(150)        | YES  |     | NULL    |       |
+| mode         | enum('bus','train') | YES  |     | NULL    |       |
+| isAccessible | tinyint(1)          | YES  |     | NULL    |       |
++--------------+---------------------+------+-----+---------+-------+
+4 rows in set (0.002 sec)
+
+mysql> describe StationLine;
++--------------+----------+------+-----+---------+-------+
+| Field        | Type     | Null | Key | Default | Extra |
++--------------+----------+------+-----+---------+-------+
+| stationID    | int      | NO   | PRI | NULL    |       |
+| lineID       | int      | NO   | PRI | NULL    |       |
+| stopSequence | smallint | NO   |     | NULL    |       |
++--------------+----------+------+-----+---------+-------+
+3 rows in set (0.002 sec)
+
+mysql> describe TimeTable;
++-------------+---------------------------------------------------------+------+-----+---------+-------+
+| Field       | Type                                                    | Null | Key | Default | Extra |
++-------------+---------------------------------------------------------+------+-----+---------+-------+
+| timetableID | int                                                     | NO   | PRI | NULL    |       |
+| lineID      | int                                                     | NO   | MUL | NULL    |       |
+| stationID   | int                                                     | NO   | MUL | NULL    |       |
+| dayType     | enum('weekday','saturday','sunday_holiday')             | YES  |     | NULL    |       |
+| timeOfDay   | time                                                    | NO   |     | NULL    |       |
+| direction   | enum('northbound','southbound','eastbound','westbound') | YES  |     | NULL    |       |
++-------------+---------------------------------------------------------+------+-----+---------+-------+

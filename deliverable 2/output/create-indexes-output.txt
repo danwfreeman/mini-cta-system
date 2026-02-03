@@ -1,0 +1,60 @@
+
+
+
+mysql> CREATE INDEX idx_timetable_lookup
+    ->   ON TimeTable (lineID, stationID, dayType, direction, timeOfDay);
+Query OK, 0 rows affected (0.011 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> show index from TimeTable;
++-----------+------------+----------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+| Table     | Non_unique | Key_name             | Seq_in_index | Column_name | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment | Visible | Expression |
++-----------+------------+----------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+| TimeTable |          0 | PRIMARY              |            1 | timetableID | A         |         210 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| TimeTable |          1 | fk_timetable_station |            1 | stationID   | A         |           9 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| TimeTable |          1 | idx_timetable_lookup |            1 | lineID      | A         |           8 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| TimeTable |          1 | idx_timetable_lookup |            2 | stationID   | A         |          12 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| TimeTable |          1 | idx_timetable_lookup |            3 | dayType     | A         |          13 |     NULL |   NULL | YES  | BTREE      |         |               | YES     | NULL       |
+| TimeTable |          1 | idx_timetable_lookup |            4 | direction   | A         |          21 |     NULL |   NULL | YES  | BTREE      |         |               | YES     | NULL       |
+| TimeTable |          1 | idx_timetable_lookup |            5 | timeOfDay   | A         |         210 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
++-----------+------------+----------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+7 rows in set (0.002 sec)
+
+mysql> CREATE INDEX idx_stationline_line_sequence
+    ->   ON StationLine (lineID, stopSequence, stationID);
+Query OK, 0 rows affected (0.008 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> show index from StationLine;
++-------------+------------+-------------------------------+--------------+--------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+| Table       | Non_unique | Key_name                      | Seq_in_index | Column_name  | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment | Visible | Expression |
++-------------+------------+-------------------------------+--------------+--------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+| StationLine |          0 | PRIMARY                       |            1 | stationID    | A         |          12 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| StationLine |          0 | PRIMARY                       |            2 | lineID       | A         |          15 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| StationLine |          1 | idx_stationline_line_sequence |            1 | lineID       | A         |           5 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| StationLine |          1 | idx_stationline_line_sequence |            2 | stopSequence | A         |          15 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| StationLine |          1 | idx_stationline_line_sequence |            3 | stationID    | A         |          15 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
++-------------+------------+-------------------------------+--------------+--------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+5 rows in set (0.002 sec)
+
+mysql> CREATE INDEX idx_alert_time
+    ->   ON Alert (startTime, endTime);
+Query OK, 0 rows affected (0.010 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> CREATE INDEX idx_alert_severity_time
+    ->   ON Alert (severity, startTime);
+Query OK, 0 rows affected (0.010 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> show index from Alert;
++-------+------------+-------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+| Table | Non_unique | Key_name                | Seq_in_index | Column_name | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment | Visible | Expression |
++-------+------------+-------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+| Alert |          0 | PRIMARY                 |            1 | alertID     | A         |          15 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| Alert |          1 | idx_alert_time          |            1 | startTime   | A         |          15 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| Alert |          1 | idx_alert_time          |            2 | endTime     | A         |          15 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| Alert |          1 | idx_alert_severity_time |            1 | severity    | A         |           3 |     NULL |   NULL | YES  | BTREE      |         |               | YES     | NULL       |
+| Alert |          1 | idx_alert_severity_time |            2 | startTime   | A         |          15 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
++-------+------------+-------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+5 rows in set (0.002 sec)

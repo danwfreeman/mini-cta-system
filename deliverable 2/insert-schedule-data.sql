@@ -1,0 +1,266 @@
+
+-- TimeTable seed 
+-- Spacing: 6–10 minutes depending on partition.
+
+
+-- 1) Red Line (1) @ Jackson (1004), weekday, southbound
+-- 10 arrivals every 6 minutes from 06:00 to 06:54
+INSERT INTO TimeTable (timetableID, lineID, stationID, dayType, timeOfDay, direction) VALUES
+(30001, 1, 1004, 'weekday', '06:00:00', 'southbound'),
+(30002, 1, 1004, 'weekday', '06:06:00', 'southbound'),
+(30003, 1, 1004, 'weekday', '06:12:00', 'southbound'),
+(30004, 1, 1004, 'weekday', '06:18:00', 'southbound'),
+(30005, 1, 1004, 'weekday', '06:24:00', 'southbound'),
+(30006, 1, 1004, 'weekday', '06:30:00', 'southbound'),
+(30007, 1, 1004, 'weekday', '06:36:00', 'southbound'),
+(30008, 1, 1004, 'weekday', '06:42:00', 'southbound'),
+(30009, 1, 1004, 'weekday', '06:48:00', 'southbound'),
+(30010, 1, 1004, 'weekday', '06:54:00', 'southbound'),
+
+-- 2) Red Line (1) @ Jackson (1004), weekday, northbound
+-- 10 arrivals every 6 minutes from 17:00 to 17:54
+(30011, 1, 1004, 'weekday', '17:00:00', 'northbound'),
+(30012, 1, 1004, 'weekday', '17:06:00', 'northbound'),
+(30013, 1, 1004, 'weekday', '17:12:00', 'northbound'),
+(30014, 1, 1004, 'weekday', '17:18:00', 'northbound'),
+(30015, 1, 1004, 'weekday', '17:24:00', 'northbound'),
+(30016, 1, 1004, 'weekday', '17:30:00', 'northbound'),
+(30017, 1, 1004, 'weekday', '17:36:00', 'northbound'),
+(30018, 1, 1004, 'weekday', '17:42:00', 'northbound'),
+(30019, 1, 1004, 'weekday', '17:48:00', 'northbound'),
+(30020, 1, 1004, 'weekday', '17:54:00', 'northbound'),
+
+-- 3) Blue Line (2) @ Clark/Lake (1006), weekday, eastbound
+-- 10 arrivals every 7 minutes from 06:15 to 07:18
+(30021, 2, 1006, 'weekday', '06:15:00', 'eastbound'),
+(30022, 2, 1006, 'weekday', '06:22:00', 'eastbound'),
+(30023, 2, 1006, 'weekday', '06:29:00', 'eastbound'),
+(30024, 2, 1006, 'weekday', '06:36:00', 'eastbound'),
+(30025, 2, 1006, 'weekday', '06:43:00', 'eastbound'),
+(30026, 2, 1006, 'weekday', '06:50:00', 'eastbound'),
+(30027, 2, 1006, 'weekday', '06:57:00', 'eastbound'),
+(30028, 2, 1006, 'weekday', '07:04:00', 'eastbound'),
+(30029, 2, 1006, 'weekday', '07:11:00', 'eastbound'),
+(30030, 2, 1006, 'weekday', '07:18:00', 'eastbound'),
+
+-- 4) Blue Line (2) @ Clark/Lake (1006), weekday, westbound
+-- 10 arrivals every 7 minutes from 17:20 to 18:23
+(30031, 2, 1006, 'weekday', '17:20:00', 'westbound'),
+(30032, 2, 1006, 'weekday', '17:27:00', 'westbound'),
+(30033, 2, 1006, 'weekday', '17:34:00', 'westbound'),
+(30034, 2, 1006, 'weekday', '17:41:00', 'westbound'),
+(30035, 2, 1006, 'weekday', '17:48:00', 'westbound'),
+(30036, 2, 1006, 'weekday', '17:55:00', 'westbound'),
+(30037, 2, 1006, 'weekday', '18:02:00', 'westbound'),
+(30038, 2, 1006, 'weekday', '18:09:00', 'westbound'),
+(30039, 2, 1006, 'weekday', '18:16:00', 'westbound'),
+(30040, 2, 1006, 'weekday', '18:23:00', 'westbound'),
+
+-- 5) Bus: 8 Halsted (9) @ Halsted/79th (1011), weekday, northbound
+-- 10 arrivals every 10 minutes from 07:00 to 08:30
+(30041, 9, 1011, 'weekday', '07:00:00', 'northbound'),
+(30042, 9, 1011, 'weekday', '07:10:00', 'northbound'),
+(30043, 9, 1011, 'weekday', '07:20:00', 'northbound'),
+(30044, 9, 1011, 'weekday', '07:30:00', 'northbound'),
+(30045, 9, 1011, 'weekday', '07:40:00', 'northbound'),
+(30046, 9, 1011, 'weekday', '07:50:00', 'northbound'),
+(30047, 9, 1011, 'weekday', '08:00:00', 'northbound'),
+(30048, 9, 1011, 'weekday', '08:10:00', 'northbound'),
+(30049, 9, 1011, 'weekday', '08:20:00', 'northbound'),
+(30050, 9, 1011, 'weekday', '08:30:00', 'northbound'),
+
+-- add extra data so the system has more to work with
+-- Red Line (1) @ Jackson (1004) - saturday - southbound (every 8 min)
+(30051, 1, 1004, 'saturday', '09:00:00', 'southbound'),
+(30052, 1, 1004, 'saturday', '09:08:00', 'southbound'),
+(30053, 1, 1004, 'saturday', '09:16:00', 'southbound'),
+(30054, 1, 1004, 'saturday', '09:24:00', 'southbound'),
+(30055, 1, 1004, 'saturday', '09:32:00', 'southbound'),
+(30056, 1, 1004, 'saturday', '09:40:00', 'southbound'),
+(30057, 1, 1004, 'saturday', '09:48:00', 'southbound'),
+(30058, 1, 1004, 'saturday', '09:56:00', 'southbound'),
+(30059, 1, 1004, 'saturday', '10:04:00', 'southbound'),
+(30060, 1, 1004, 'saturday', '10:12:00', 'southbound'),
+
+-- Red Line (1) @ Jackson (1004) - saturday - northbound (every 8 min)
+(30061, 1, 1004, 'saturday', '18:00:00', 'northbound'),
+(30062, 1, 1004, 'saturday', '18:08:00', 'northbound'),
+(30063, 1, 1004, 'saturday', '18:16:00', 'northbound'),
+(30064, 1, 1004, 'saturday', '18:24:00', 'northbound'),
+(30065, 1, 1004, 'saturday', '18:32:00', 'northbound'),
+(30066, 1, 1004, 'saturday', '18:40:00', 'northbound'),
+(30067, 1, 1004, 'saturday', '18:48:00', 'northbound'),
+(30068, 1, 1004, 'saturday', '18:56:00', 'northbound'),
+(30069, 1, 1004, 'saturday', '19:04:00', 'northbound'),
+(30070, 1, 1004, 'saturday', '19:12:00', 'northbound'),
+
+-- Red Line (1) @ Roosevelt (1005) - weekday - southbound (every 6 min)
+(30071, 1, 1005, 'weekday', '06:05:00', 'southbound'),
+(30072, 1, 1005, 'weekday', '06:11:00', 'southbound'),
+(30073, 1, 1005, 'weekday', '06:17:00', 'southbound'),
+(30074, 1, 1005, 'weekday', '06:23:00', 'southbound'),
+(30075, 1, 1005, 'weekday', '06:29:00', 'southbound'),
+(30076, 1, 1005, 'weekday', '06:35:00', 'southbound'),
+(30077, 1, 1005, 'weekday', '06:41:00', 'southbound'),
+(30078, 1, 1005, 'weekday', '06:47:00', 'southbound'),
+(30079, 1, 1005, 'weekday', '06:53:00', 'southbound'),
+(30080, 1, 1005, 'weekday', '06:59:00', 'southbound'),
+
+-- Red Line (1) @ Roosevelt (1005) - weekday - northbound (every 6 min)
+(30081, 1, 1005, 'weekday', '17:05:00', 'northbound'),
+(30082, 1, 1005, 'weekday', '17:11:00', 'northbound'),
+(30083, 1, 1005, 'weekday', '17:17:00', 'northbound'),
+(30084, 1, 1005, 'weekday', '17:23:00', 'northbound'),
+(30085, 1, 1005, 'weekday', '17:29:00', 'northbound'),
+(30086, 1, 1005, 'weekday', '17:35:00', 'northbound'),
+(30087, 1, 1005, 'weekday', '17:41:00', 'northbound'),
+(30088, 1, 1005, 'weekday', '17:47:00', 'northbound'),
+(30089, 1, 1005, 'weekday', '17:53:00', 'northbound'),
+(30090, 1, 1005, 'weekday', '17:59:00', 'northbound'),
+
+
+-- Blue Line (2) @ Jackson (1004) - weekday - eastbound (every 7 min)
+(30091, 2, 1004, 'weekday', '06:10:00', 'eastbound'),
+(30092, 2, 1004, 'weekday', '06:17:00', 'eastbound'),
+(30093, 2, 1004, 'weekday', '06:24:00', 'eastbound'),
+(30094, 2, 1004, 'weekday', '06:31:00', 'eastbound'),
+(30095, 2, 1004, 'weekday', '06:38:00', 'eastbound'),
+(30096, 2, 1004, 'weekday', '06:45:00', 'eastbound'),
+(30097, 2, 1004, 'weekday', '06:52:00', 'eastbound'),
+(30098, 2, 1004, 'weekday', '06:59:00', 'eastbound'),
+(30099, 2, 1004, 'weekday', '07:06:00', 'eastbound'),
+(30100, 2, 1004, 'weekday', '07:13:00', 'eastbound'),
+
+-- Blue Line (2) @ Jackson (1004) - weekday - westbound (every 7 min)
+(30101, 2, 1004, 'weekday', '17:30:00', 'westbound'),
+(30102, 2, 1004, 'weekday', '17:37:00', 'westbound'),
+(30103, 2, 1004, 'weekday', '17:44:00', 'westbound'),
+(30104, 2, 1004, 'weekday', '17:51:00', 'westbound'),
+(30105, 2, 1004, 'weekday', '17:58:00', 'westbound'),
+(30106, 2, 1004, 'weekday', '18:05:00', 'westbound'),
+(30107, 2, 1004, 'weekday', '18:12:00', 'westbound'),
+(30108, 2, 1004, 'weekday', '18:19:00', 'westbound'),
+(30109, 2, 1004, 'weekday', '18:26:00', 'westbound'),
+(30110, 2, 1004, 'weekday', '18:33:00', 'westbound'),
+
+-- Brown Line (3) @ Belmont (1002) - weekday - southbound (every 8 min)
+(30111, 3, 1002, 'weekday', '07:00:00', 'southbound'),
+(30112, 3, 1002, 'weekday', '07:08:00', 'southbound'),
+(30113, 3, 1002, 'weekday', '07:16:00', 'southbound'),
+(30114, 3, 1002, 'weekday', '07:24:00', 'southbound'),
+(30115, 3, 1002, 'weekday', '07:32:00', 'southbound'),
+(30116, 3, 1002, 'weekday', '07:40:00', 'southbound'),
+(30117, 3, 1002, 'weekday', '07:48:00', 'southbound'),
+(30118, 3, 1002, 'weekday', '07:56:00', 'southbound'),
+(30119, 3, 1002, 'weekday', '08:04:00', 'southbound'),
+(30120, 3, 1002, 'weekday', '08:12:00', 'southbound'),
+
+-- Brown Line (3) @ Belmont (1002) - weekday - northbound (every 8 min)
+(30121, 3, 1002, 'weekday', '16:30:00', 'northbound'),
+(30122, 3, 1002, 'weekday', '16:38:00', 'northbound'),
+(30123, 3, 1002, 'weekday', '16:46:00', 'northbound'),
+(30124, 3, 1002, 'weekday', '16:54:00', 'northbound'),
+(30125, 3, 1002, 'weekday', '17:02:00', 'northbound'),
+(30126, 3, 1002, 'weekday', '17:10:00', 'northbound'),
+(30127, 3, 1002, 'weekday', '17:18:00', 'northbound'),
+(30128, 3, 1002, 'weekday', '17:26:00', 'northbound'),
+(30129, 3, 1002, 'weekday', '17:34:00', 'northbound'),
+(30130, 3, 1002, 'weekday', '17:42:00', 'northbound'),
+
+
+-- Green Line (4) @ Clark/Lake (1006) - sunday_holiday - eastbound (every 10 min)
+(30131, 4, 1006, 'sunday_holiday', '12:00:00', 'eastbound'),
+(30132, 4, 1006, 'sunday_holiday', '12:10:00', 'eastbound'),
+(30133, 4, 1006, 'sunday_holiday', '12:20:00', 'eastbound'),
+(30134, 4, 1006, 'sunday_holiday', '12:30:00', 'eastbound'),
+(30135, 4, 1006, 'sunday_holiday', '12:40:00', 'eastbound'),
+(30136, 4, 1006, 'sunday_holiday', '12:50:00', 'eastbound'),
+(30137, 4, 1006, 'sunday_holiday', '13:00:00', 'eastbound'),
+(30138, 4, 1006, 'sunday_holiday', '13:10:00', 'eastbound'),
+(30139, 4, 1006, 'sunday_holiday', '13:20:00', 'eastbound'),
+(30140, 4, 1006, 'sunday_holiday', '13:30:00', 'eastbound'),
+
+-- Green Line (4) @ Clark/Lake (1006) - sunday_holiday - westbound (every 10 min)(30141, 4, 1006, 'sunday_holiday', '13:40:00', 'westbound'),
+(30142, 4, 1006, 'sunday_holiday', '13:50:00', 'westbound'),
+(30143, 4, 1006, 'sunday_holiday', '14:00:00', 'westbound'),
+(30144, 4, 1006, 'sunday_holiday', '14:10:00', 'westbound'),
+(30145, 4, 1006, 'sunday_holiday', '14:20:00', 'westbound'),
+(30146, 4, 1006, 'sunday_holiday', '14:30:00', 'westbound'),
+(30147, 4, 1006, 'sunday_holiday', '14:40:00', 'westbound'),
+(30148, 4, 1006, 'sunday_holiday', '14:50:00', 'westbound'),
+(30149, 4, 1006, 'sunday_holiday', '15:00:00', 'westbound'),
+(30150, 4, 1006, 'sunday_holiday', '15:10:00', 'westbound'),
+
+
+-- Orange Line (5) @ Roosevelt (1005) - weekday - northbound (every 10 min)
+(30151, 5, 1005, 'weekday', '06:20:00', 'northbound'),
+(30152, 5, 1005, 'weekday', '06:30:00', 'northbound'),
+(30153, 5, 1005, 'weekday', '06:40:00', 'northbound'),
+(30154, 5, 1005, 'weekday', '06:50:00', 'northbound'),
+(30155, 5, 1005, 'weekday', '07:00:00', 'northbound'),
+(30156, 5, 1005, 'weekday', '07:10:00', 'northbound'),
+(30157, 5, 1005, 'weekday', '07:20:00', 'northbound'),
+(30158, 5, 1005, 'weekday', '07:30:00', 'northbound'),
+(30159, 5, 1005, 'weekday', '07:40:00', 'northbound'),
+(30160, 5, 1005, 'weekday', '07:50:00', 'northbound'),
+
+-- Orange Line (5) @ Roosevelt (1005) - weekday - southbound (every 10 min)
+(30161, 5, 1005, 'weekday', '17:20:00', 'southbound'),
+(30162, 5, 1005, 'weekday', '17:30:00', 'southbound'),
+(30163, 5, 1005, 'weekday', '17:40:00', 'southbound'),
+(30164, 5, 1005, 'weekday', '17:50:00', 'southbound'),
+(30165, 5, 1005, 'weekday', '18:00:00', 'southbound'),
+(30166, 5, 1005, 'weekday', '18:10:00', 'southbound'),
+(30167, 5, 1005, 'weekday', '18:20:00', 'southbound'),
+(30168, 5, 1005, 'weekday', '18:30:00', 'southbound'),
+(30169, 5, 1005, 'weekday', '18:40:00', 'southbound'),
+(30170, 5, 1005, 'weekday', '18:50:00', 'southbound'),
+
+
+-- Bus 8 Halsted (9) @ Broadway/Waveland (1012) - weekday - southbound (every 12 min)
+(30171, 9, 1012, 'weekday', '06:12:00', 'southbound'),
+(30172, 9, 1012, 'weekday', '06:24:00', 'southbound'),
+(30173, 9, 1012, 'weekday', '06:36:00', 'southbound'),
+(30174, 9, 1012, 'weekday', '06:48:00', 'southbound'),
+(30175, 9, 1012, 'weekday', '07:00:00', 'southbound'),
+(30176, 9, 1012, 'weekday', '07:12:00', 'southbound'),
+(30177, 9, 1012, 'weekday', '07:24:00', 'southbound'),
+(30178, 9, 1012, 'weekday', '07:36:00', 'southbound'),
+(30179, 9, 1012, 'weekday', '07:48:00', 'southbound'),
+(30180, 9, 1012, 'weekday', '08:00:00', 'southbound'),
+
+-- Bus 9 Ashland (10) @ Ashland/63rd (1013) - weekday - northbound (every 10 min)
+(30181, 10, 1013, 'weekday', '07:00:00', 'northbound'),
+(30182, 10, 1013, 'weekday', '07:10:00', 'northbound'),
+(30183, 10, 1013, 'weekday', '07:20:00', 'northbound'),
+(30184, 10, 1013, 'weekday', '07:30:00', 'northbound'),
+(30185, 10, 1013, 'weekday', '07:40:00', 'northbound'),
+(30186, 10, 1013, 'weekday', '07:50:00', 'northbound'),
+(30187, 10, 1013, 'weekday', '08:00:00', 'northbound'),
+(30188, 10, 1013, 'weekday', '08:10:00', 'northbound'),
+(30189, 10, 1013, 'weekday', '08:20:00', 'northbound'),
+(30190, 10, 1013, 'weekday', '08:30:00', 'northbound'),
+
+-- Bus 66 Chicago (14) @ Michigan/Chicago (1014) - weekday - eastbound (every 8 min)
+(30191, 14, 1014, 'weekday', '08:00:00', 'eastbound'),
+(30192, 14, 1014, 'weekday', '08:08:00', 'eastbound'),
+(30193, 14, 1014, 'weekday', '08:16:00', 'eastbound'),
+(30194, 14, 1014, 'weekday', '08:24:00', 'eastbound'),
+(30195, 14, 1014, 'weekday', '08:32:00', 'eastbound'),
+(30196, 14, 1014, 'weekday', '08:40:00', 'eastbound'),
+(30197, 14, 1014, 'weekday', '08:48:00', 'eastbound'),
+(30198, 14, 1014, 'weekday', '08:56:00', 'eastbound'),
+(30199, 14, 1014, 'weekday', '09:04:00', 'eastbound'),
+(30200, 14, 1014, 'weekday', '09:12:00', 'eastbound'),
+
+-- Bus 66 Chicago (14) @ Navy Pier Terminal (1015) - weekday - westbound (every 8 min)
+(30201, 14, 1015, 'weekday', '09:20:00', 'westbound'),
+(30202, 14, 1015, 'weekday', '09:28:00', 'westbound'),
+(30203, 14, 1015, 'weekday', '09:36:00', 'westbound'),
+(30204, 14, 1015, 'weekday', '09:44:00', 'westbound'),
+(30205, 14, 1015, 'weekday', '09:52:00', 'westbound'),
+(30206, 14, 1015, 'weekday', '10:00:00', 'westbound'),
+(30207, 14, 1015, 'weekday', '10:08:00', 'westbound'),
+(30208, 14, 1015, 'weekday', '10:16:00', 'westbound'),
+(30209, 14, 1015, 'weekday', '10:24:00', 'westbound'),
+(30210, 14, 1015, 'weekday', '10:32:00', 'westbound');

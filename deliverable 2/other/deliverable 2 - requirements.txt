@@ -1,0 +1,11 @@
+2nd Deliverable 
+(Create and load data into the database)
+
+Create the database in the database system (MySQL, PostgreSQL) using general Data Definition Language (DDL) statements. 
+Load mock data (from free online data generator tools) into the database. 
+Ensure that you have loaded at least 15 records per relation. 
+Furthermore, you are required to implement indexes, views, temporary tables, triggers, stored procedures, 
+and functions in your database (assume interesting business logic where applicable). 
+Display the statements you have employed for each task, along with the corresponding output.
+
+Save all of your working files into a single zipped folder and upload it below.  
