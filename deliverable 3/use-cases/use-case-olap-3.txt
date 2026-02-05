@@ -1,27 +1,49 @@
 3) OLAP
 
-As a user I want to know the mumber of stops on a trip from one the start station to the end station, useful for bus lines
+Show quartile grouping for headways by NTILE (show the breakdown in 4 equal parts) PARTITION BY lineID, dayType, direction 
+and show the average headway in minutes per group
 
-notes:
-- we want to demonstrate an OLAP SUM() query, this could also be achived with a regular count(*) qeury
 
-mysql> SELECT
-       l.name AS lineName,
-       SUM(1)
-     FROM Line l
-     JOIN StationLine sl_from ON sl_from.lineID = l.lineID
-     JOIN StationLine sl_to   ON sl_to.lineID   = l.lineID
-     JOIN StationLine sl_mid  ON sl_mid.lineID  = l.lineID
-     JOIN Station s_from ON s_from.stationID = sl_from.stationID
-     JOIN Station s_to   ON s_to.stationID   = sl_to.stationID
-     WHERE l.name = '66 Chicago'
-       AND s_from.name = 'Michigan/Chicago'
-       AND s_to.name   = 'Shore Drive'
-     AND sl_mid.stopSequence >= sl_from.stopSequence
-     AND sl_mid.stopSequence <= sl_to.stopSequence;
-+------------+--------+
-| lineName   | SUM(1) |
-+------------+--------+
-| 66 Chicago |      4 |
-+------------+--------+
-1 row in set (0.001 sec)
+WITH headways AS (
+  SELECT
+    l.name AS lineName,
+    tt.dayType,
+    tt.direction,
+    tt.stationID,
+    tt.timeOfDay AS arrivalTime,
+    TIMESTAMPDIFF(
+      MINUTE,
+      tt.timeOfDay,
+      LEAD(tt.timeOfDay) OVER (
+        PARTITION BY tt.lineID, tt.stationID, tt.dayType, tt.direction
+        ORDER BY tt.timeOfDay
+      )
+    ) AS headwayMinutes
+  FROM TimeTable tt
+  JOIN Line l ON l.lineID = tt.lineID
+),
+quartiled AS (
+  SELECT
+    lineName,
+    dayType,
+    direction,
+    headwayMinutes,
+    NTILE(4) OVER (
+      PARTITION BY lineName, dayType, direction
+      ORDER BY headwayMinutes
+    ) AS headwayQuartile
+  FROM headways
+  WHERE headwayMinutes IS NOT NULL
+    AND headwayMinutes >= 0
+)
+SELECT
+  lineName,
+  dayType,
+  direction,
+  headwayQuartile,
+  AVG(headwayMinutes) AS avgHeadwayMinutes
+FROM quartiled
+GROUP BY
+  lineName, dayType, direction, headwayQuartile
+ORDER BY
+  lineName, dayType, direction, headwayQuartile;

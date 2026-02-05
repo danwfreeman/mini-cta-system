@@ -1,1 +1,64 @@
-- average number of stations per line (train or bus)
+1) Window
+
+As a user of the sytem I want to know how time time between trains, for a 2 hour window, in case I miss one of the trains, I want to know how long I have to wait until the next train arrives.
+
+We see in this query, for the blue line at clark/lake, for the 2 hour window ona. weekday the trains come every 7 minutes.
+
+notes:
+-filter out any entries that have an nextArrivalTime as null, as we specify a window that will always not have a next arrival time as the last time, since it will be out of the window time frame.
+-we have to use the TIMESTAMPDIFF function because we're dealing with date/times here, rather than just integers, otherwise we could use the minus operator in the sql statement
+-we always want the same line/station/day/direction for the lead time, therefore we use the PARTITION BY
+
+mysql> SELECT
+       lineName,
+       stationName,
+       dayType,
+       direction,
+       arrivalTime,
+       nextArrivalTime,
+       minutesUntilNext
+     FROM (
+       SELECT
+         l.name AS lineName,
+         s.name AS stationName,
+         tt.dayType,
+         tt.direction,
+         tt.timeOfDay AS arrivalTime,
+         LEAD(tt.timeOfDay) OVER (
+           PARTITION BY tt.lineID, tt.stationID, tt.dayType, tt.direction
+           ORDER BY tt.timeOfDay
+         ) AS nextArrivalTime,
+         TIMESTAMPDIFF(
+           MINUTE,
+           tt.timeOfDay,
+           LEAD(tt.timeOfDay) OVER (
+             PARTITION BY tt.lineID, tt.stationID, tt.dayType, tt.direction
+             ORDER BY tt.timeOfDay
+           )
+         ) AS minutesUntilNext
+       FROM TimeTable tt
+       JOIN Line l    ON l.lineID = tt.lineID
+       JOIN Station s ON s.stationID = tt.stationID
+       WHERE l.name = 'Blue Line'
+         AND s.name = 'Clark/Lake'
+         AND tt.dayType = 'weekday'
+         AND tt.direction = 'eastbound'
+       AND tt.timeOfDay >= '6:00:00'
+       AND tt.timeOfDay <  '8:00:00'
+     ) t
+     WHERE t.nextArrivalTime IS NOT NULL
+     ORDER BY t.arrivalTime;
++-----------+-------------+---------+-----------+-------------+-----------------+------------------+
+| lineName  | stationName | dayType | direction | arrivalTime | nextArrivalTime | minutesUntilNext |
++-----------+-------------+---------+-----------+-------------+-----------------+------------------+
+| Blue Line | Clark/Lake  | weekday | eastbound | 06:15:00    | 06:22:00        |                7 |
+| Blue Line | Clark/Lake  | weekday | eastbound | 06:22:00    | 06:29:00        |                7 |
+| Blue Line | Clark/Lake  | weekday | eastbound | 06:29:00    | 06:36:00        |                7 |
+| Blue Line | Clark/Lake  | weekday | eastbound | 06:36:00    | 06:43:00        |                7 |
+| Blue Line | Clark/Lake  | weekday | eastbound | 06:43:00    | 06:50:00        |                7 |
+| Blue Line | Clark/Lake  | weekday | eastbound | 06:50:00    | 06:57:00        |                7 |
+| Blue Line | Clark/Lake  | weekday | eastbound | 06:57:00    | 07:04:00        |                7 |
+| Blue Line | Clark/Lake  | weekday | eastbound | 07:04:00    | 07:11:00        |                7 |
+| Blue Line | Clark/Lake  | weekday | eastbound | 07:11:00    | 07:18:00        |                7 |
++-----------+-------------+---------+-----------+-------------+-----------------+------------------+
+9 rows in set (0.002 sec)

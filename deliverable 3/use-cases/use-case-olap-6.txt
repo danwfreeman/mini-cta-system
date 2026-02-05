@@ -1,0 +1,38 @@
+6) OLAP
+
+As an operator I want to see the rank of stations by service frequency - which stations have the most arrivals
+
+notes:
+-we want dense rank here as we don't want gaps in the service rank
+
+
+mysql> WITH station_arrivals AS (
+            SELECT
+              s.name AS stationName,
+              COUNT(*) AS arrivalCount
+            FROM TimeTable tt
+            JOIN Station s ON s.stationID = tt.stationID
+            GROUP BY s.name
+          )
+          SELECT
+            stationName,
+            arrivalCount,
+            DENSE_RANK() OVER (ORDER BY arrivalCount DESC) AS serviceRank
+          FROM station_arrivals
+          ORDER BY arrivalCount DESC, stationName;
++--------------------+--------------+-------------+
+| stationName        | arrivalCount | serviceRank |
++--------------------+--------------+-------------+
+| Jackson            |           60 |           1 |
+| Roosevelt          |           40 |           2 |
+| Clark/Lake         |           39 |           3 |
+| Belmont            |           20 |           4 |
+| Ashland/63rd       |           10 |           5 |
+| Broadway/Waveland  |           10 |           5 |
+| Halsted/79th       |           10 |           5 |
+| Huron              |           10 |           5 |
+| Michigan/Chicago   |           10 |           5 |
+| Navy Pier Terminal |           10 |           5 |
+| Shore Drive        |           10 |           5 |
++--------------------+--------------+-------------+
+11 rows in set (0.001 sec)

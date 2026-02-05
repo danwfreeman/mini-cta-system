@@ -1,1 +1,60 @@
-- average time in minutes between arrivals per station on peak hours
+
+2) Window
+
+As a user of the system I want to calculate the total duration of a trip from the start station to my end station, 
+so I know the duration of my trip. I want to compare trip times depending on which start time I choose.
+
+
+notes:
+-I assume that the first entry in each station list of arrivales times are for the same actual bus, the 2nd arrival time in each station is for the same bus (in this case the 2nd bus on the line), ect.  
+ Because of this assumption we can then use the ROW_NUMBER function and assign a row number to each row and use that as the tripNumber and assoicate the departTime, arrivalTime and totalTripTime
+
+
+mysql> WITH start_times AS (
+       SELECT
+         tt.timeOfDay AS departTime,
+         ROW_NUMBER() OVER (ORDER BY tt.timeOfDay) AS rn
+       FROM TimeTable tt
+       JOIN Line l    ON l.lineID = tt.lineID
+       JOIN Station s ON s.stationID = tt.stationID
+       WHERE l.name = '66 Chicago'
+         AND s.name = 'Michigan/Chicago'
+         AND tt.dayType = 'weekday'
+         AND tt.direction = 'northbound'
+     ),
+     end_times AS (
+       SELECT
+         tt.timeOfDay AS arriveTime,
+         ROW_NUMBER() OVER (ORDER BY tt.timeOfDay) AS rn
+       FROM TimeTable tt
+       JOIN Line l    ON l.lineID = tt.lineID
+       JOIN Station s ON s.stationID = tt.stationID
+       WHERE l.name = '66 Chicago'
+         AND s.name = 'Shore Drive'
+         AND tt.dayType = 'weekday'
+         AND tt.direction = 'northbound'
+     )
+     SELECT
+       st.rn AS tripNumber,
+       st.departTime,
+       et.arriveTime,
+       TIMESTAMPDIFF(MINUTE, st.departTime, et.arriveTime) AS tripDurationMinutes
+     FROM start_times st
+     JOIN end_times et ON et.rn = st.rn
+     WHERE et.arriveTime > st.departTime   -- ensure arrival is after departure
+     ORDER BY st.rn;
++------------+------------+------------+---------------------+
+| tripNumber | departTime | arriveTime | tripDurationMinutes |
++------------+------------+------------+---------------------+
+|          1 | 08:00:00   | 12:04:00   |                 244 |
+|          2 | 08:08:00   | 12:14:00   |                 246 |
+|          3 | 08:16:00   | 12:24:00   |                 248 |
+|          4 | 08:24:00   | 12:34:00   |                 250 |
+|          5 | 08:32:00   | 12:44:00   |                 252 |
+|          6 | 08:40:00   | 12:54:00   |                 254 |
+|          7 | 08:48:00   | 13:04:00   |                 256 |
+|          8 | 08:56:00   | 13:14:00   |                 258 |
+|          9 | 09:04:00   | 13:24:00   |                 260 |
+|         10 | 09:12:00   | 13:34:00   |                 262 |
++------------+------------+------------+---------------------+
+10 rows in set (0.002 sec)

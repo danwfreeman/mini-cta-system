@@ -1,0 +1,34 @@
+5) OLAP 
+
+As an operator, I want to view the number of peak arrivals vs non peak arrival grouped by mode (train or bus) and dayType 
+
+
+mysql> SELECT
+       l.mode,                
+       tt.dayType,
+       SUM(
+         CASE WHEN fn_is_peak_time_by_day(tt.timeOfDay, tt.dayType)
+              THEN 1 ELSE 0 END
+       ) AS peakArrivals,
+       SUM(
+         CASE WHEN fn_is_peak_time_by_day(tt.timeOfDay, tt.dayType)
+              THEN 0 ELSE 1 END
+       ) AS nonPeakArrivals,
+       COUNT(*) AS totalArrivals
+     FROM TimeTable tt
+     JOIN Line l ON l.lineID = tt.lineID
+     GROUP BY
+       l.mode,
+       tt.dayType
+     ORDER BY
+       l.mode,
+       tt.dayType;
++-------+----------------+--------------+-----------------+---------------+
+| mode  | dayType        | peakArrivals | nonPeakArrivals | totalArrivals |
++-------+----------------+--------------+-----------------+---------------+
+| bus   | weekday        |           34 |              36 |            70 |
+| train | weekday        |           66 |              54 |           120 |
+| train | saturday       |            0 |              20 |            20 |
+| train | sunday_holiday |            0 |              19 |            19 |
++-------+----------------+--------------+-----------------+---------------+
+4 rows in set (0.008 sec)
