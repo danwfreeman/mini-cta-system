@@ -1,56 +1,58 @@
 3) Window
 
 I want to see a rolling average time between arrivals that go back over the last 15 mins for a line at a station for a specific direction 
+(ie a 15min rolling average for wait times)
 
 notes:
 -this is a window query as we have lead data for each entry of a result set
 -since the data has the time intervals consistent between stations the average times are all equal
-
+-expands on the window query in window-1 use case and adds the rolling window with the range function
 
 mysql> WITH base AS (
-       SELECT
-         l.name AS lineName,
-         s.name AS stationName,
-         tt.dayType,
-         tt.direction,
-         tt.timeOfDay AS arrivalTime,
-         TIME_TO_SEC(tt.timeOfDay) AS arrivalSec,
-         LEAD(tt.timeOfDay) OVER (
-           PARTITION BY tt.lineID, tt.stationID, tt.dayType, tt.direction
-           ORDER BY tt.timeOfDay
-         ) AS nextArrivalTime,
-         TIMESTAMPDIFF(
-           MINUTE,
-           tt.timeOfDay,
-           LEAD(tt.timeOfDay) OVER (
-             PARTITION BY tt.lineID, tt.stationID, tt.dayType, tt.direction
-             ORDER BY tt.timeOfDay
-           )
-         ) AS minutesUntilNext
-       FROM TimeTable tt
-       JOIN Line l    ON l.lineID = tt.lineID
-       JOIN Station s ON s.stationID = tt.stationID
-       WHERE l.name = 'Blue Line'
-         AND tt.dayType = 'weekday'
-         AND tt.timeOfDay >= '06:00:00'
-         AND tt.timeOfDay <  '13:00:00'
-     )
-     SELECT
-       lineName,
-       stationName,
-       dayType,
-       direction,
-       arrivalTime,
-       nextArrivalTime,
-       minutesUntilNext,
-       AVG(minutesUntilNext) OVER (
-         PARTITION BY lineName, stationName, dayType, direction
-         ORDER BY arrivalSec
-         RANGE BETWEEN 900 PRECEDING AND CURRENT ROW
-       ) AS rollingAvgHeadway_15min
-     FROM base
-     WHERE nextArrivalTime IS NOT NULL
-     ORDER BY stationName, direction, arrivalTime;
+            SELECT
+              l.name AS lineName,
+              s.name AS stationName,
+              tt.dayType,
+              tt.direction,
+              tt.timeOfDay AS arrivalTime,
+              TIME_TO_SEC(tt.timeOfDay) AS arrivalSec,
+              LEAD(tt.timeOfDay) OVER (
+                PARTITION BY tt.lineID, tt.stationID, tt.dayType, tt.direction
+                ORDER BY tt.timeOfDay
+              ) AS nextArrivalTime,
+              TIMESTAMPDIFF(
+                MINUTE,
+                tt.timeOfDay,
+                LEAD(tt.timeOfDay) OVER (
+                  PARTITION BY tt.lineID, tt.stationID, tt.dayType, tt.direction
+                  ORDER BY tt.timeOfDay
+                )
+              ) AS minutesUntilNext
+            FROM TimeTable tt
+            JOIN Line l    ON l.lineID = tt.lineID
+            JOIN Station s ON s.stationID = tt.stationID
+            WHERE l.name = 'Blue Line'
+              AND s.name = 'Clark/Lake'
+              AND tt.dayType = 'weekday'
+              AND tt.timeOfDay >= '06:00:00'
+              AND tt.timeOfDay <  '13:00:00'
+          )
+          SELECT
+            lineName,
+            stationName,
+            dayType,
+            direction,
+            arrivalTime,
+            nextArrivalTime,
+            minutesUntilNext,
+            AVG(minutesUntilNext) OVER (
+              PARTITION BY lineName, stationName, dayType, direction
+              ORDER BY arrivalSec
+              RANGE BETWEEN 900 PRECEDING AND CURRENT ROW
+            ) AS rollingAvgHeadway_15min
+          FROM base
+          WHERE nextArrivalTime IS NOT NULL
+          ORDER BY stationName, direction, arrivalTime;
 +-----------+-------------+---------+-----------+-------------+-----------------+------------------+-------------------------+
 | lineName  | stationName | dayType | direction | arrivalTime | nextArrivalTime | minutesUntilNext | rollingAvgHeadway_15min |
 +-----------+-------------+---------+-----------+-------------+-----------------+------------------+-------------------------+
@@ -63,14 +65,5 @@ mysql> WITH base AS (
 | Blue Line | Clark/Lake  | weekday | eastbound | 06:57:00    | 07:04:00        |                7 |                  7.0000 |
 | Blue Line | Clark/Lake  | weekday | eastbound | 07:04:00    | 07:11:00        |                7 |                  7.0000 |
 | Blue Line | Clark/Lake  | weekday | eastbound | 07:11:00    | 07:18:00        |                7 |                  7.0000 |
-| Blue Line | Jackson     | weekday | eastbound | 06:10:00    | 06:17:00        |                7 |                  7.0000 |
-| Blue Line | Jackson     | weekday | eastbound | 06:17:00    | 06:24:00        |                7 |                  7.0000 |
-| Blue Line | Jackson     | weekday | eastbound | 06:24:00    | 06:31:00        |                7 |                  7.0000 |
-| Blue Line | Jackson     | weekday | eastbound | 06:31:00    | 06:38:00        |                7 |                  7.0000 |
-| Blue Line | Jackson     | weekday | eastbound | 06:38:00    | 06:45:00        |                7 |                  7.0000 |
-| Blue Line | Jackson     | weekday | eastbound | 06:45:00    | 06:52:00        |                7 |                  7.0000 |
-| Blue Line | Jackson     | weekday | eastbound | 06:52:00    | 06:59:00        |                7 |                  7.0000 |
-| Blue Line | Jackson     | weekday | eastbound | 06:59:00    | 07:06:00        |                7 |                  7.0000 |
-| Blue Line | Jackson     | weekday | eastbound | 07:06:00    | 07:13:00        |                7 |                  7.0000 |
 +-----------+-------------+---------+-----------+-------------+-----------------+------------------+-------------------------+
-18 rows in set (0.001 sec)
+9 rows in set (0.002 sec)
