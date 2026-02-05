@@ -1,9 +1,13 @@
 3) OLAP
 
+As a system operator, I want to see how long the average wait times are in each quartile, for each line and direction.
 Show quartile grouping for headways by NTILE (show the breakdown in 4 equal parts) PARTITION BY lineID, dayType, direction 
 and show the average headway in minutes per group.
 
-notes: the data for arrival time are very uniform, often the same mins apart per station/line, therefore the similar results per quartile
+An operator would want to know which lines are not performing as well as they should, seeing the average value in each of the 4 buckets 
+show how much one bucket may be affecting the overall average wait times for the line
+
+notes: the data for arrival time are very uniform, often the same mins apart per station/line, hence the similar results per quartile
 
 
 mysql> WITH headways AS (

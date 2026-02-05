@@ -69,6 +69,39 @@ INSERT INTO StationLine (stationID, lineID, stopSequence) VALUES
 -- Bus 151 Sheridan
 (1014, 15, 1);  -- Michigan/Chicago
 
+INSERT INTO StationLine (stationID, lineID, stopSequence) VALUES
+-- Brown Line (train)
+(1002, 3,  1),  -- Belmont
+(1003, 3,  2),  -- Fullerton
+(1006, 3,  3),  -- Clark/Lake
+
+-- Green Line (train)
+(1001, 4,  1),  -- Howard
+(1006, 4,  2),  -- Clark/Lake
+(1005, 4,  3),  -- Roosevelt
+
+-- Orange Line (train)
+(1005, 5,  1),  -- Roosevelt
+(1009, 5,  2),  -- Cermak-Chinatown
+(1010, 5,  3),  -- Sox-35th
+
+-- Purple Line (train)
+(1001, 6,  1),  -- Howard
+(1002, 6,  2),  -- Belmont
+(1003, 6,  3),  -- Fullerton
+
+-- Pink Line (train)
+(1003, 7,  1),  -- Fullerton
+(1006, 7,  2),  -- Clark/Lake
+(1005, 7,  3),  -- Roosevelt
+
+-- Yellow Line (train)
+(1001, 8,  1),  -- Howard
+(1006, 8,  2),  -- Clark/Lake
+(1004, 8,  3);  -- Jackson
+
+
+
 -- bus 66 Chicago
 INSERT INTO StationLine (stationID, lineID, stopSequence) VALUES
 (1014, 14, 1),  -- Michigan/Chicago

@@ -2,6 +2,9 @@
 
 As an operator I want to see the rank of stations by service frequency - which stations have the most arrivals
 
+When auditing the sytem, I want to know which station provide the most frequent service
+
+
 notes:
 -we want dense rank here as we don't want gaps in the service rank
 

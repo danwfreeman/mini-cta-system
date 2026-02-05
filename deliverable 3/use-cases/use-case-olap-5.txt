@@ -2,6 +2,10 @@
 
 As an operator, I want to view the number of peak arrivals vs non peak arrivala grouped by mode (train or bus) and dayType 
 
+I would expect to see a considerably higher number of arrival times in peak hours vs non peak
+
+note: 
+-saturday and sunday_holiday are non peak times, there the values are expected to be 0
 
 mysql> SELECT
        l.mode,                

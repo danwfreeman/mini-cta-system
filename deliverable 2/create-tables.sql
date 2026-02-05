@@ -10,9 +10,8 @@ DROP TABLE IF EXISTS Fare;
 DROP TABLE IF EXISTS Station;
 DROP TABLE IF EXISTS Line;
 
--- ------------------------------------------
+
 -- Line
--- ------------------------------------------
 CREATE TABLE Line (
   lineID INT NOT NULL,
   name VARCHAR(100),
@@ -20,9 +19,8 @@ CREATE TABLE Line (
   PRIMARY KEY (lineID)
 ) ENGINE=InnoDB;
 
--- ------------------------------------------
+
 -- Station
--- ------------------------------------------
 CREATE TABLE Station (
   stationID INT NOT NULL,
   name VARCHAR(150),
@@ -31,9 +29,8 @@ CREATE TABLE Station (
   PRIMARY KEY (stationID)
 ) ENGINE=InnoDB;
 
--- ------------------------------------------
+
 -- StationLine (join table)
--- ------------------------------------------
 CREATE TABLE StationLine (
   stationID INT NOT NULL,
   lineID INT NOT NULL,
@@ -49,9 +46,8 @@ CREATE TABLE StationLine (
     ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
--- ------------------------------------------
+
 -- TimeTable
--- ------------------------------------------
 CREATE TABLE TimeTable (
   timetableID INT NOT NULL,
   lineID INT NOT NULL,
@@ -70,9 +66,8 @@ CREATE TABLE TimeTable (
     ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
--- ------------------------------------------
+
 -- Fare
--- ------------------------------------------
 CREATE TABLE Fare (
   fareID INT NOT NULL,
   fareCategory VARCHAR(60),
@@ -81,9 +76,8 @@ CREATE TABLE Fare (
   PRIMARY KEY (fareID)
 ) ENGINE=InnoDB;
 
--- ------------------------------------------
+
 -- Alert
--- ------------------------------------------
 CREATE TABLE Alert (
   alertID INT NOT NULL,
   title VARCHAR(150),
@@ -94,9 +88,8 @@ CREATE TABLE Alert (
   PRIMARY KEY (alertID)
 ) ENGINE=InnoDB;
 
--- ------------------------------------------
+
 -- AlertLine (join table)
--- ------------------------------------------
 CREATE TABLE AlertLine (
   alertID INT NOT NULL,
   lineID INT NOT NULL,
@@ -111,9 +104,8 @@ CREATE TABLE AlertLine (
     ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
--- ------------------------------------------
+
 -- AlertStation (join table)
--- ------------------------------------------
 CREATE TABLE AlertStation (
   alertID INT NOT NULL,
   stationID INT NOT NULL,
