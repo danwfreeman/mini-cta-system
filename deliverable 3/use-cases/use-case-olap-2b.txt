@@ -10,41 +10,41 @@ notes:
 
 
 mysql> WITH start_times AS (
-    ->   SELECT
-    ->     tt.timeOfDay AS departTime,
-    ->     ROW_NUMBER() OVER (ORDER BY tt.timeOfDay) AS rn
-    ->   FROM TimeTable tt
-    ->   JOIN Line l    ON l.lineID = tt.lineID
-    ->   JOIN Station s ON s.stationID = tt.stationID
-    ->   WHERE l.name = '66 Chicago'
-    ->     AND s.name = 'Michigan/Chicago'
-    ->     AND tt.dayType = 'weekday'
-    ->     AND tt.direction = 'northbound'
-    -> ),
-    -> end_times AS (
-    ->   SELECT
-    ->     tt.timeOfDay AS arriveTime,
-    ->     ROW_NUMBER() OVER (ORDER BY tt.timeOfDay) AS rn
-    ->   FROM TimeTable tt
-    ->   JOIN Line l    ON l.lineID = tt.lineID
-    ->   JOIN Station s ON s.stationID = tt.stationID
-    ->   WHERE l.name = '66 Chicago'
-    ->     AND s.name = 'Shore Drive'
-    ->     AND tt.dayType = 'weekday'
-    ->     AND tt.direction = 'northbound'
-    -> ),
-    -> trip_durations AS (
-    ->   SELECT
-    ->     TIMESTAMPDIFF(MINUTE, st.departTime, et.arriveTime) AS tripMinutes
-    ->   FROM start_times st
-    ->   JOIN end_times et ON et.rn = st.rn
-    ->   WHERE et.arriveTime > st.departTime
-    -> )
-    -> SELECT
-    ->   AVG(tripMinutes) AS avgTripMinutes,
-    ->   MIN(tripMinutes) AS minTripMinutes,
-    ->   MAX(tripMinutes) AS maxTripMinutes
-    -> FROM trip_durations;
+       SELECT
+         tt.timeOfDay AS departTime,
+         ROW_NUMBER() OVER (ORDER BY tt.timeOfDay) AS rn
+       FROM TimeTable tt
+       JOIN Line l    ON l.lineID = tt.lineID
+       JOIN Station s ON s.stationID = tt.stationID
+       WHERE l.name = '66 Chicago'
+         AND s.name = 'Michigan/Chicago'
+         AND tt.dayType = 'weekday'
+         AND tt.direction = 'northbound'
+     ),
+     end_times AS (
+       SELECT
+         tt.timeOfDay AS arriveTime,
+         ROW_NUMBER() OVER (ORDER BY tt.timeOfDay) AS rn
+       FROM TimeTable tt
+       JOIN Line l    ON l.lineID = tt.lineID
+       JOIN Station s ON s.stationID = tt.stationID
+       WHERE l.name = '66 Chicago'
+         AND s.name = 'Shore Drive'
+         AND tt.dayType = 'weekday'
+         AND tt.direction = 'northbound'
+     ),
+     trip_durations AS (
+       SELECT
+         TIMESTAMPDIFF(MINUTE, st.departTime, et.arriveTime) AS tripMinutes
+       FROM start_times st
+       JOIN end_times et ON et.rn = st.rn
+       WHERE et.arriveTime > st.departTime
+     )
+     SELECT
+       AVG(tripMinutes) AS avgTripMinutes,
+       MIN(tripMinutes) AS minTripMinutes,
+       MAX(tripMinutes) AS maxTripMinutes
+     FROM trip_durations;
 +----------------+----------------+----------------+
 | avgTripMinutes | minTripMinutes | maxTripMinutes |
 +----------------+----------------+----------------+

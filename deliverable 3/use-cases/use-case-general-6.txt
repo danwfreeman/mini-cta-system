@@ -2,7 +2,7 @@
 
 As a rider of the system, I want to see all the fares for each rider category with the fare for each
 
-- show me all fares by grouped by rider category
+- show me all fares grouped by rider category
 
 mysql> SELECT
        fareCategory,

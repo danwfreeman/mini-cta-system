@@ -7,23 +7,6 @@ In this case I want to know the times for the Red Line heading northbound from t
 Note, this uses the is peak time function to show the user that these this a peak time schedule 
 
 
-SELECT
-  l.name       AS lineName,
-  s.name       AS stationName,
-  tt.dayType,
-  tt.direction,
-  tt.timeOfDay,
-  fn_is_peak_time_by_day(tt.timeOfDay, tt.dayType) AS isPeak
-FROM TimeTable tt
-JOIN Line l    ON l.lineID = tt.lineID
-JOIN Station s ON s.stationID = tt.stationID
-WHERE l.name = 'Red Line'
-  AND s.name = 'Jackson'
-  AND tt.dayType = 'weekday'
-  AND tt.direction = 'northbound'
-  AND tt.timeOfDay BETWEEN '16:00:00' AND '18:00:00'
-ORDER BY tt.timeOfDay;
-
 
 mysql> SELECT
        l.name       AS lineName,
