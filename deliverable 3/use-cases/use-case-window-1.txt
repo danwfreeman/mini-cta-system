@@ -1,8 +1,8 @@
 1) Window
 
-As a user of the sytem I want to know how time time between trains, for a 2 hour window, in case I miss one of the trains, I want to know how long I have to wait until the next train arrives.
+As a user of the sytem I want to know the time between trains, for a 2 hour window, in case a train is missed, I want to know how the wait time until the next train arrives.
 
-We see in this query, for the blue line at clark/lake, for the 2 hour window ona. weekday the trains come every 7 minutes.
+We see in this query, for the blue line at clark/lake, for the 2 hour window, on a weekday, the trains come every 7 minutes.
 
 notes:
 -filter out any entries that have an nextArrivalTime as null, as we specify a window that will always not have a next arrival time as the last time, since it will be out of the window time frame.

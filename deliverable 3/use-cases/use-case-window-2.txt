@@ -2,11 +2,11 @@
 2) Window
 
 As a user of the system I want to calculate the total duration of a trip from the start station to my end station, 
-so I know the duration of my trip. I want to compare trip times depending on which start time I choose.
+so I know the duration of the trip. I want to compare trip times depending on which start time I choose.
 
 
 notes:
--I assume that the first entry in each station list of arrivales times are for the same actual bus, the 2nd arrival time in each station is for the same bus (in this case the 2nd bus on the line), ect.  
+-We can safely assume that the first entry in each station list of arrivales times are for the same actual bus, the 2nd arrival time in each station is for the same bus (in this case the 2nd bus on the line), ect.  
  Because of this assumption we can then use the ROW_NUMBER function and assign a row number to each row and use that as the tripNumber and assoicate the departTime, arrivalTime and totalTripTime
 
 

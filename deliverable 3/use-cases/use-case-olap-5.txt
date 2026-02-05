@@ -1,6 +1,6 @@
 5) OLAP 
 
-As an operator, I want to view the number of peak arrivals vs non peak arrival grouped by mode (train or bus) and dayType 
+As an operator, I want to view the number of peak arrivals vs non peak arrivala grouped by mode (train or bus) and dayType 
 
 
 mysql> SELECT

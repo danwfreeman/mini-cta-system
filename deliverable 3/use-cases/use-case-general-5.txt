@@ -1,7 +1,8 @@
 5) General Query
 
 
-As a rider planning a trip, similar to alerts on a line, now show me all alerts that are currently active for a station, I want to see the mode of the station in my results (train or bus)
+As a rider planning a trip, similar to alerts on a line, now show me all alerts that are currently active for a station,
+I want to see the mode of the station in my results (train or bus)
 
 
 mysql> SELECT

@@ -2,6 +2,10 @@
 
 I want to see a rolling average time between arrivals that go back over the last 15 mins for a line at a station for a specific direction 
 
+notes:
+-this is a window query as we have lead data for each entry of a result set
+-since the data has the time intervals consistent between stations the average times are all equal
+
 
 mysql> WITH base AS (
        SELECT

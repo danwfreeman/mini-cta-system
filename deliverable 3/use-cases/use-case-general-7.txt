@@ -3,10 +3,10 @@
 
 As a rider of the system, for a particular line, show me all stations that are accessible and do not have an alert associated with them.
 
-I want to plan a trip and need an elevator at a station, therefore I want to know which stations along my line have working elevator.
+I want to plan a trip and need an elevator at the station, therefore I want to know which stations along my line have a working elevator.
 
 notes:
--stations wtih alertID of NULL are what we want, typically we'd hide the NULL fields in the user interface, shown here for clarity
+-stations wtih alertID of NULL are what we want, typically we'd hide the NULL fields in the user interface, shown here for clarity.
 
 mysql> SELECT
        l.name AS lineName,

@@ -1,12 +1,11 @@
 
 2) OLAP
 
-As a user of the sytem, building on the window 2 query, I want to know the min, max and average trip times
+As a user of the system, building on the window 2 query, I want to know the min, max and average trip times
 
 
 notes:
--this is straight forward once we have the window query, I can feed that exact query into a select and run AVG, MIN, MAX aggregation functions over that data
-
+-this is straight forward once we have the window query, we can feed that exact query into a select and run AVG, MIN, MAX aggregation functions over that result set
 
 
 mysql> WITH start_times AS (

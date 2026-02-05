@@ -1,49 +1,120 @@
 3) OLAP
 
 Show quartile grouping for headways by NTILE (show the breakdown in 4 equal parts) PARTITION BY lineID, dayType, direction 
-and show the average headway in minutes per group
+and show the average headway in minutes per group.
+
+notes: the data for arrival time are very uniform, often the same mins apart per station/line, therefore the similar results per quartile
 
 
-WITH headways AS (
-  SELECT
-    l.name AS lineName,
-    tt.dayType,
-    tt.direction,
-    tt.stationID,
-    tt.timeOfDay AS arrivalTime,
-    TIMESTAMPDIFF(
-      MINUTE,
-      tt.timeOfDay,
-      LEAD(tt.timeOfDay) OVER (
-        PARTITION BY tt.lineID, tt.stationID, tt.dayType, tt.direction
-        ORDER BY tt.timeOfDay
-      )
-    ) AS headwayMinutes
-  FROM TimeTable tt
-  JOIN Line l ON l.lineID = tt.lineID
-),
-quartiled AS (
-  SELECT
-    lineName,
-    dayType,
-    direction,
-    headwayMinutes,
-    NTILE(4) OVER (
-      PARTITION BY lineName, dayType, direction
-      ORDER BY headwayMinutes
-    ) AS headwayQuartile
-  FROM headways
-  WHERE headwayMinutes IS NOT NULL
-    AND headwayMinutes >= 0
-)
-SELECT
-  lineName,
-  dayType,
-  direction,
-  headwayQuartile,
-  AVG(headwayMinutes) AS avgHeadwayMinutes
-FROM quartiled
-GROUP BY
-  lineName, dayType, direction, headwayQuartile
-ORDER BY
-  lineName, dayType, direction, headwayQuartile;
+mysql> WITH headways AS (
+       SELECT
+         l.name AS lineName,
+         tt.dayType,
+         tt.direction,
+         tt.stationID,
+         tt.timeOfDay AS arrivalTime,
+         TIMESTAMPDIFF(
+           MINUTE,
+           tt.timeOfDay,
+           LEAD(tt.timeOfDay) OVER (
+             PARTITION BY tt.lineID, tt.stationID, tt.dayType, tt.direction
+             ORDER BY tt.timeOfDay
+           )
+         ) AS headwayMinutes
+       FROM TimeTable tt
+       JOIN Line l ON l.lineID = tt.lineID
+     ),
+     quartiled AS (
+       SELECT
+         lineName,
+         dayType,
+         direction,
+         headwayMinutes,
+         NTILE(4) OVER (
+           PARTITION BY lineName, dayType, direction
+           ORDER BY headwayMinutes
+         ) AS headwayQuartile
+       FROM headways
+       WHERE headwayMinutes IS NOT NULL
+         AND headwayMinutes >= 0
+     )
+     SELECT
+       lineName,
+       dayType,
+       direction,
+       headwayQuartile,
+       AVG(headwayMinutes) AS avgHeadwayMinutes
+     FROM quartiled
+     GROUP BY
+       lineName, dayType, direction, headwayQuartile
+     ORDER BY
+       lineName, dayType, direction, headwayQuartile;
++-------------+----------------+------------+-----------------+-------------------+
+| lineName    | dayType        | direction  | headwayQuartile | avgHeadwayMinutes |
++-------------+----------------+------------+-----------------+-------------------+
+| 66 Chicago  | weekday        | northbound |               1 |            8.0000 |
+| 66 Chicago  | weekday        | northbound |               2 |            8.0000 |
+| 66 Chicago  | weekday        | northbound |               3 |           10.0000 |
+| 66 Chicago  | weekday        | northbound |               4 |           10.0000 |
+| 8 Halsted   | weekday        | northbound |               1 |           10.0000 |
+| 8 Halsted   | weekday        | northbound |               2 |           10.0000 |
+| 8 Halsted   | weekday        | northbound |               3 |           10.0000 |
+| 8 Halsted   | weekday        | northbound |               4 |           10.0000 |
+| 8 Halsted   | weekday        | southbound |               1 |           12.0000 |
+| 8 Halsted   | weekday        | southbound |               2 |           12.0000 |
+| 8 Halsted   | weekday        | southbound |               3 |           12.0000 |
+| 8 Halsted   | weekday        | southbound |               4 |           12.0000 |
+| 9 Ashland   | weekday        | northbound |               1 |           10.0000 |
+| 9 Ashland   | weekday        | northbound |               2 |           10.0000 |
+| 9 Ashland   | weekday        | northbound |               3 |           10.0000 |
+| 9 Ashland   | weekday        | northbound |               4 |           10.0000 |
+| Blue Line   | weekday        | eastbound  |               1 |            7.0000 |
+| Blue Line   | weekday        | eastbound  |               2 |            7.0000 |
+| Blue Line   | weekday        | eastbound  |               3 |            7.0000 |
+| Blue Line   | weekday        | eastbound  |               4 |            7.0000 |
+| Blue Line   | weekday        | westbound  |               1 |            7.0000 |
+| Blue Line   | weekday        | westbound  |               2 |            7.0000 |
+| Blue Line   | weekday        | westbound  |               3 |            7.0000 |
+| Blue Line   | weekday        | westbound  |               4 |            7.0000 |
+| Brown Line  | weekday        | northbound |               1 |            8.0000 |
+| Brown Line  | weekday        | northbound |               2 |            8.0000 |
+| Brown Line  | weekday        | northbound |               3 |            8.0000 |
+| Brown Line  | weekday        | northbound |               4 |            8.0000 |
+| Brown Line  | weekday        | southbound |               1 |            8.0000 |
+| Brown Line  | weekday        | southbound |               2 |            8.0000 |
+| Brown Line  | weekday        | southbound |               3 |            8.0000 |
+| Brown Line  | weekday        | southbound |               4 |            8.0000 |
+| Green Line  | sunday_holiday | eastbound  |               1 |           10.0000 |
+| Green Line  | sunday_holiday | eastbound  |               2 |           10.0000 |
+| Green Line  | sunday_holiday | eastbound  |               3 |           10.0000 |
+| Green Line  | sunday_holiday | eastbound  |               4 |           10.0000 |
+| Green Line  | sunday_holiday | westbound  |               1 |           10.0000 |
+| Green Line  | sunday_holiday | westbound  |               2 |           10.0000 |
+| Green Line  | sunday_holiday | westbound  |               3 |           10.0000 |
+| Green Line  | sunday_holiday | westbound  |               4 |           10.0000 |
+| Orange Line | weekday        | northbound |               1 |           10.0000 |
+| Orange Line | weekday        | northbound |               2 |           10.0000 |
+| Orange Line | weekday        | northbound |               3 |           10.0000 |
+| Orange Line | weekday        | northbound |               4 |           10.0000 |
+| Orange Line | weekday        | southbound |               1 |           10.0000 |
+| Orange Line | weekday        | southbound |               2 |           10.0000 |
+| Orange Line | weekday        | southbound |               3 |           10.0000 |
+| Orange Line | weekday        | southbound |               4 |           10.0000 |
+| Red Line    | weekday        | northbound |               1 |            6.0000 |
+| Red Line    | weekday        | northbound |               2 |            6.0000 |
+| Red Line    | weekday        | northbound |               3 |            6.0000 |
+| Red Line    | weekday        | northbound |               4 |            6.0000 |
+| Red Line    | weekday        | southbound |               1 |            6.0000 |
+| Red Line    | weekday        | southbound |               2 |            6.0000 |
+| Red Line    | weekday        | southbound |               3 |            6.0000 |
+| Red Line    | weekday        | southbound |               4 |            6.0000 |
+| Red Line    | saturday       | northbound |               1 |            8.0000 |
+| Red Line    | saturday       | northbound |               2 |            8.0000 |
+| Red Line    | saturday       | northbound |               3 |            8.0000 |
+| Red Line    | saturday       | northbound |               4 |            8.0000 |
+| Red Line    | saturday       | southbound |               1 |            8.0000 |
+| Red Line    | saturday       | southbound |               2 |            8.0000 |
+| Red Line    | saturday       | southbound |               3 |            8.0000 |
+| Red Line    | saturday       | southbound |               4 |            8.0000 |
++-------------+----------------+------------+-----------------+-------------------+
+64 rows in set (0.006 sec)
