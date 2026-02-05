@@ -1,0 +1,58 @@
+2) General Query
+
+Show me a list of times for station for a particular line for a day of the week for a 2 hour time frame and a particular direction 
+
+As a user, I want to see the schedule for a line from a station heading in a particular, I want to now for a 2 hour window what the times will be.
+In this case I want to know the times for the Red Line heading northbound from teh Jackson station on weekdays
+Note, this uses the is peak time function to show the user that these this a peak time schedule 
+
+
+SELECT
+  l.name       AS lineName,
+  s.name       AS stationName,
+  tt.dayType,
+  tt.direction,
+  tt.timeOfDay,
+  fn_is_peak_time_by_day(tt.timeOfDay, tt.dayType) AS isPeak
+FROM TimeTable tt
+JOIN Line l    ON l.lineID = tt.lineID
+JOIN Station s ON s.stationID = tt.stationID
+WHERE l.name = 'Red Line'
+  AND s.name = 'Jackson'
+  AND tt.dayType = 'weekday'
+  AND tt.direction = 'northbound'
+  AND tt.timeOfDay BETWEEN '16:00:00' AND '18:00:00'
+ORDER BY tt.timeOfDay;
+
+
+mysql> SELECT
+       l.name       AS lineName,
+       s.name       AS stationName,
+       tt.dayType,
+       tt.direction,
+       tt.timeOfDay,
+       fn_is_peak_time_by_day(tt.timeOfDay, tt.dayType) AS isPeak
+     FROM TimeTable tt
+     JOIN Line l    ON l.lineID = tt.lineID
+     JOIN Station s ON s.stationID = tt.stationID
+     WHERE l.name = 'Red Line'
+       AND s.name = 'Jackson'
+       AND tt.dayType = 'weekday'
+       AND tt.direction = 'northbound'
+       AND tt.timeOfDay BETWEEN '16:00:00' AND '18:00:00'
+     ORDER BY tt.timeOfDay;
++----------+-------------+---------+------------+-----------+--------+
+| lineName | stationName | dayType | direction  | timeOfDay | isPeak |
++----------+-------------+---------+------------+-----------+--------+
+| Red Line | Jackson     | weekday | northbound | 17:00:00  |      1 |
+| Red Line | Jackson     | weekday | northbound | 17:06:00  |      1 |
+| Red Line | Jackson     | weekday | northbound | 17:12:00  |      1 |
+| Red Line | Jackson     | weekday | northbound | 17:18:00  |      1 |
+| Red Line | Jackson     | weekday | northbound | 17:24:00  |      1 |
+| Red Line | Jackson     | weekday | northbound | 17:30:00  |      1 |
+| Red Line | Jackson     | weekday | northbound | 17:36:00  |      1 |
+| Red Line | Jackson     | weekday | northbound | 17:42:00  |      1 |
+| Red Line | Jackson     | weekday | northbound | 17:48:00  |      1 |
+| Red Line | Jackson     | weekday | northbound | 17:54:00  |      1 |
++----------+-------------+---------+------------+-----------+--------+
+10 rows in set (0.002 sec)

@@ -38,6 +38,10 @@ INSERT INTO Station (stationID, name, mode, isAccessible) VALUES
 (1014, 'Michigan/Chicago',  'bus',   TRUE),
 (1015, 'Navy Pier Terminal','bus',   TRUE);
 
+INSERT INTO Station (stationID, name, mode, isAccessible) VALUES
+(1016, 'Huron','bus',   TRUE),
+(1017, 'Shore Drive','bus',   TRUE);
+
 -- Connect stations to lines with a simple stopSequence.
 INSERT INTO StationLine (stationID, lineID, stopSequence) VALUES
 -- Red Line (train)
@@ -64,6 +68,13 @@ INSERT INTO StationLine (stationID, lineID, stopSequence) VALUES
 
 -- Bus 151 Sheridan
 (1014, 15, 1);  -- Michigan/Chicago
+
+-- bus 66 Chicago
+INSERT INTO StationLine (stationID, lineID, stopSequence) VALUES
+(1014, 14, 1),  -- Michigan/Chicago
+(1015, 14, 2),  -- Navy Pier Terminal
+(1016, 14, 3),  -- Huron
+(1017, 14, 4);  -- Shore Drive
 
 
 -- A few sample times across lines, stations, day types, directions
@@ -111,7 +122,16 @@ INSERT INTO Fare (fareID, fareCategory, riderCategory, price) VALUES
 
 (3013, 'pass_1_day',         'regular', 5.00),
 (3014, 'pass_7_day',         'regular', 20.00),
-(3015, 'pass_30_day_reduced','reduced',  35.00);
+(3015, 'pass_30_day',        'regular', 75.00),
+
+(3016, 'pass_1_day',         'reduced', 4.50),
+(3017, 'pass_1_day',         'student', 4.00),
+(3018, 'pass_30_day',        'reduced', 65.00),
+(3019, 'pass_30_day',        'student', 55.00),
+(3020, 'pass_7_day',         'reduced', 18.00),
+(3021, 'pass_7_day',         'student', 15.00);
+
+
 
 -- Mock service + elevator-style alerts, with Jan 2026 timestamps
 INSERT INTO Alert (alertID, title, description, startTime, endTime, severity) VALUES

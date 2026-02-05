@@ -1,0 +1,1 @@
+- quartile grouping for headways by NTILE (show me the breakdown in 4 equal parts of the headways) PARTITION BY lineID, dayType, direction

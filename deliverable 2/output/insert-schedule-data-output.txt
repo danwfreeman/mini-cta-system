@@ -235,29 +235,57 @@ mysql> INSERT INTO TimeTable (timetableID, lineID, stationID, dayType, timeOfDay
     -> (30188, 10, 1013, 'weekday', '08:10:00', 'northbound'),
     -> (30189, 10, 1013, 'weekday', '08:20:00', 'northbound'),
     -> (30190, 10, 1013, 'weekday', '08:30:00', 'northbound'),
-    -> 
-    -> -- Bus 66 Chicago (14) @ Michigan/Chicago (1014) - weekday - eastbound (every 8 min)
-    -> (30191, 14, 1014, 'weekday', '08:00:00', 'eastbound'),
-    -> (30192, 14, 1014, 'weekday', '08:08:00', 'eastbound'),
-    -> (30193, 14, 1014, 'weekday', '08:16:00', 'eastbound'),
-    -> (30194, 14, 1014, 'weekday', '08:24:00', 'eastbound'),
-    -> (30195, 14, 1014, 'weekday', '08:32:00', 'eastbound'),
-    -> (30196, 14, 1014, 'weekday', '08:40:00', 'eastbound'),
-    -> (30197, 14, 1014, 'weekday', '08:48:00', 'eastbound'),
-    -> (30198, 14, 1014, 'weekday', '08:56:00', 'eastbound'),
-    -> (30199, 14, 1014, 'weekday', '09:04:00', 'eastbound'),
-    -> (30200, 14, 1014, 'weekday', '09:12:00', 'eastbound'),
-    -> 
-    -> -- Bus 66 Chicago (14) @ Navy Pier Terminal (1015) - weekday - westbound (every 8 min)
-    -> (30201, 14, 1015, 'weekday', '09:20:00', 'westbound'),
-    -> (30202, 14, 1015, 'weekday', '09:28:00', 'westbound'),
-    -> (30203, 14, 1015, 'weekday', '09:36:00', 'westbound'),
-    -> (30204, 14, 1015, 'weekday', '09:44:00', 'westbound'),
-    -> (30205, 14, 1015, 'weekday', '09:52:00', 'westbound'),
-    -> (30206, 14, 1015, 'weekday', '10:00:00', 'westbound'),
-    -> (30207, 14, 1015, 'weekday', '10:08:00', 'westbound'),
-    -> (30208, 14, 1015, 'weekday', '10:16:00', 'westbound'),
-    -> (30209, 14, 1015, 'weekday', '10:24:00', 'westbound'),
-    -> (30210, 14, 1015, 'weekday', '10:32:00', 'westbound');
+    ->
+    -> -- Bus 66 Chicago (14) @ Michigan/Chicago (1014) - weekday - northbound (every 8 min)
+    -> (30191, 14, 1014, 'weekday', '08:00:00', 'northbound'),
+    -> (30192, 14, 1014, 'weekday', '08:08:00', 'northbound'),
+    -> (30193, 14, 1014, 'weekday', '08:16:00', 'northbound'),
+    -> (30194, 14, 1014, 'weekday', '08:24:00', 'northbound'),
+    -> (30195, 14, 1014, 'weekday', '08:32:00', 'northbound'),
+    -> (30196, 14, 1014, 'weekday', '08:40:00', 'northbound'),
+    -> (30197, 14, 1014, 'weekday', '08:48:00', 'northbound'),
+    -> (30198, 14, 1014, 'weekday', '08:56:00', 'northbound'),
+    -> (30199, 14, 1014, 'weekday', '09:04:00', 'northbound'),
+    -> (30200, 14, 1014, 'weekday', '09:12:00', 'northbound'),
+    -> -- Bus 66 Chicago (14) @ Navy Pier Terminal (1015) - weekday - northbound (every 8 min)
+    -> (30201, 14, 1015, 'weekday', '09:20:00', 'northbound'),
+    -> (30202, 14, 1015, 'weekday', '09:28:00', 'northbound'),
+    -> (30203, 14, 1015, 'weekday', '09:36:00', 'northbound'),
+    -> (30204, 14, 1015, 'weekday', '09:44:00', 'northbound'),
+    -> (30205, 14, 1015, 'weekday', '09:52:00', 'northbound'),
+    -> (30206, 14, 1015, 'weekday', '10:00:00', 'northbound'),
+    -> (30207, 14, 1015, 'weekday', '10:08:00', 'northbound'),
+    -> (30208, 14, 1015, 'weekday', '10:16:00', 'northbound'),
+    -> (30209, 14, 1015, 'weekday', '10:24:00', 'northbound'),
+    -> (30210, 14, 1015, 'weekday', '10:32:00', 'northbound');
 Query OK, 209 rows affected (0.003 sec)
 Records: 209  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO TimeTable (timetableID, lineID, stationID, dayType, timeOfDay, direction) VALUES
+    -> (41001, 9, 1016, 'weekday', '07:00:00', 'northbound'),
+    -> (41002, 9, 1016, 'weekday', '07:10:00', 'northbound'),
+    -> (41003, 9, 1016, 'weekday', '07:20:00', 'northbound'),
+    -> (41004, 9, 1016, 'weekday', '07:30:00', 'northbound'),
+    -> (41005, 9, 1016, 'weekday', '07:40:00', 'northbound'),
+    -> (41006, 9, 1016, 'weekday', '07:50:00', 'northbound'),
+    -> (41007, 9, 1016, 'weekday', '08:00:00', 'northbound'),
+    -> (41008, 9, 1016, 'weekday', '08:10:00', 'northbound'),
+    -> (41009, 9, 1016, 'weekday', '08:20:00', 'northbound'),
+    -> (41010, 9, 1016, 'weekday', '08:30:00', 'northbound');
+Query OK, 10 rows affected (0.005 sec)
+Records: 10  Duplicates: 0  Warnings: 0
+
+mysql> 
+mysql> INSERT INTO TimeTable (timetableID, lineID, stationID, dayType, timeOfDay, direction) VALUES
+    -> (41011, 9, 1017, 'weekday', '07:04:00', 'northbound'),
+    -> (41012, 9, 1017, 'weekday', '07:14:00', 'northbound'),
+    -> (41013, 9, 1017, 'weekday', '07:24:00', 'northbound'),
+    -> (41014, 9, 1017, 'weekday', '07:34:00', 'northbound'),
+    -> (41015, 9, 1017, 'weekday', '07:44:00', 'northbound'),
+    -> (41016, 9, 1017, 'weekday', '07:54:00', 'northbound'),
+    -> (41017, 9, 1017, 'weekday', '08:04:00', 'northbound'),
+    -> (41018, 9, 1017, 'weekday', '08:14:00', 'northbound'),
+    -> (41019, 9, 1017, 'weekday', '08:24:00', 'northbound'),
+    -> (41020, 9, 1017, 'weekday', '08:34:00', 'northbound');
+Query OK, 10 rows affected (0.002 sec)
+Records: 10  Duplicates: 0  Warnings: 0

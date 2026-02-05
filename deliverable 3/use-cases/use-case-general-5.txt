@@ -1,0 +1,27 @@
+5) General Query
+
+
+As a rider planning a trip, similar to alerts on a line, now show me all alerts that are currently active for a station, I want to see the mode of the station in my results (train or bus)
+
+
+mysql> SELECT
+       a.alertID,
+       a.title,
+       a.description,
+       a.severity,
+       a.startTime,
+       a.endTime,
+       s.name AS stationName,
+       s.mode as mode
+     FROM Alert a
+     JOIN AlertStation ast ON ast.alertID = a.alertID
+     JOIN Station s        ON s.stationID = ast.stationID
+     WHERE s.name = 'Jackson'
+       AND '2026-01-22 08:00:00' BETWEEN a.startTime AND a.endTime
+     ORDER BY a.severity, a.startTime;
++---------+---------------------------+-----------------------------------------------------------------------+----------+---------------------+---------------------+-------------+-------+
+| alertID | title                     | description                                                           | severity | startTime           | endTime             | stationName | mode  |
++---------+---------------------------+-----------------------------------------------------------------------+----------+---------------------+---------------------+-------------+-------+
+|    4001 | Red Line: residual delays | Residual delays due to earlier signal issue. Allow extra travel time. | minor    | 2026-01-22 06:10:00 | 2026-01-22 08:00:00 | Jackson     | train |
++---------+---------------------------+-----------------------------------------------------------------------+----------+---------------------+---------------------+-------------+-------+
+1 row in set (0.001 sec)

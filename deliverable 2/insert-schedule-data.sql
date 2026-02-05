@@ -241,26 +241,52 @@ INSERT INTO TimeTable (timetableID, lineID, stationID, dayType, timeOfDay, direc
 (30189, 10, 1013, 'weekday', '08:20:00', 'northbound'),
 (30190, 10, 1013, 'weekday', '08:30:00', 'northbound'),
 
--- Bus 66 Chicago (14) @ Michigan/Chicago (1014) - weekday - eastbound (every 8 min)
-(30191, 14, 1014, 'weekday', '08:00:00', 'eastbound'),
-(30192, 14, 1014, 'weekday', '08:08:00', 'eastbound'),
-(30193, 14, 1014, 'weekday', '08:16:00', 'eastbound'),
-(30194, 14, 1014, 'weekday', '08:24:00', 'eastbound'),
-(30195, 14, 1014, 'weekday', '08:32:00', 'eastbound'),
-(30196, 14, 1014, 'weekday', '08:40:00', 'eastbound'),
-(30197, 14, 1014, 'weekday', '08:48:00', 'eastbound'),
-(30198, 14, 1014, 'weekday', '08:56:00', 'eastbound'),
-(30199, 14, 1014, 'weekday', '09:04:00', 'eastbound'),
-(30200, 14, 1014, 'weekday', '09:12:00', 'eastbound'),
+-- Bus 66 Chicago (14) @ Michigan/Chicago (1014) - weekday - northbound (every 8 min)
+(30191, 14, 1014, 'weekday', '08:00:00', 'northbound'),
+(30192, 14, 1014, 'weekday', '08:08:00', 'northbound'),
+(30193, 14, 1014, 'weekday', '08:16:00', 'northbound'),
+(30194, 14, 1014, 'weekday', '08:24:00', 'northbound'),
+(30195, 14, 1014, 'weekday', '08:32:00', 'northbound'),
+(30196, 14, 1014, 'weekday', '08:40:00', 'northbound'),
+(30197, 14, 1014, 'weekday', '08:48:00', 'northbound'),
+(30198, 14, 1014, 'weekday', '08:56:00', 'northbound'),
+(30199, 14, 1014, 'weekday', '09:04:00', 'northbound'),
+(30200, 14, 1014, 'weekday', '09:12:00', 'northbound'),
 
--- Bus 66 Chicago (14) @ Navy Pier Terminal (1015) - weekday - westbound (every 8 min)
-(30201, 14, 1015, 'weekday', '09:20:00', 'westbound'),
-(30202, 14, 1015, 'weekday', '09:28:00', 'westbound'),
-(30203, 14, 1015, 'weekday', '09:36:00', 'westbound'),
-(30204, 14, 1015, 'weekday', '09:44:00', 'westbound'),
-(30205, 14, 1015, 'weekday', '09:52:00', 'westbound'),
-(30206, 14, 1015, 'weekday', '10:00:00', 'westbound'),
-(30207, 14, 1015, 'weekday', '10:08:00', 'westbound'),
-(30208, 14, 1015, 'weekday', '10:16:00', 'westbound'),
-(30209, 14, 1015, 'weekday', '10:24:00', 'westbound'),
-(30210, 14, 1015, 'weekday', '10:32:00', 'westbound');
+-- Bus 66 Chicago (14) @ Navy Pier Terminal (1015) - weekday - northbound (every 8 min)
+(30201, 14, 1015, 'weekday', '09:20:00', 'northbound'),
+(30202, 14, 1015, 'weekday', '09:28:00', 'northbound'),
+(30203, 14, 1015, 'weekday', '09:36:00', 'northbound'),
+(30204, 14, 1015, 'weekday', '09:44:00', 'northbound'),
+(30205, 14, 1015, 'weekday', '09:52:00', 'northbound'),
+(30206, 14, 1015, 'weekday', '10:00:00', 'northbound'),
+(30207, 14, 1015, 'weekday', '10:08:00', 'northbound'),
+(30208, 14, 1015, 'weekday', '10:16:00', 'northbound'),
+(30209, 14, 1015, 'weekday', '10:24:00', 'northbound'),
+(30210, 14, 1015, 'weekday', '10:32:00', 'northbound');
+
+-- Bus 66 Chicago (14) @ Huron
+INSERT INTO TimeTable (timetableID, lineID, stationID, dayType, timeOfDay, direction) VALUES
+(41001, 14, 1016, 'weekday', '11:00:00', 'northbound'),
+(41002, 14, 1016, 'weekday', '11:10:00', 'northbound'),
+(41003, 14, 1016, 'weekday', '11:20:00', 'northbound'),
+(41004, 14, 1016, 'weekday', '11:30:00', 'northbound'),
+(41005, 14, 1016, 'weekday', '11:40:00', 'northbound'),
+(41006, 14, 1016, 'weekday', '11:50:00', 'northbound'),
+(41007, 14, 1016, 'weekday', '12:00:00', 'northbound'),
+(41008, 14, 1016, 'weekday', '12:10:00', 'northbound'),
+(41009, 14, 1016, 'weekday', '12:20:00', 'northbound'),
+(41010, 14, 1016, 'weekday', '12:30:00', 'northbound');
+
+-- Bus 66 Chicago (14) @ Lake Shore Drive
+INSERT INTO TimeTable (timetableID, lineID, stationID, dayType, timeOfDay, direction) VALUES
+(41011, 14, 1017, 'weekday', '12:04:00', 'northbound'),
+(41012, 14, 1017, 'weekday', '12:14:00', 'northbound'),
+(41013, 14, 1017, 'weekday', '12:24:00', 'northbound'),
+(41014, 14, 1017, 'weekday', '12:34:00', 'northbound'),
+(41015, 14, 1017, 'weekday', '12:44:00', 'northbound'),
+(41016, 14, 1017, 'weekday', '12:54:00', 'northbound'),
+(41017, 14, 1017, 'weekday', '13:04:00', 'northbound'),
+(41018, 14, 1017, 'weekday', '13:14:00', 'northbound'),
+(41019, 14, 1017, 'weekday', '13:24:00', 'northbound'),
+(41020, 14, 1017, 'weekday', '13:34:00', 'northbound');

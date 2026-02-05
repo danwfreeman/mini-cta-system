@@ -1,0 +1,34 @@
+7) General Query
+
+
+As a rider of the system, for a particular line, show me all stations that are accessible and do not have an alert associated with them
+
+I want to plan a trip and need an elevator at a station, therefore I want to know which stations along my line that have an elevator and I can use it
+
+mysql> SELECT
+       l.name AS lineName,
+       sl.stopSequence,
+       s.stationID,
+       s.name AS stationName,
+       s.isAccessible,
+       a.alertID,
+       a.title AS alertTitle,
+       a.severity,
+       a.startTime,
+       a.endTime
+     FROM Line l
+     JOIN StationLine sl ON sl.lineID = l.lineID
+     JOIN Station s      ON s.stationID = sl.stationID
+     LEFT JOIN AlertStation ast ON ast.stationID = s.stationID
+     LEFT JOIN Alert a          ON a.alertID = ast.alertID
+     WHERE l.name = 'Red Line'
+       AND s.isAccessible = TRUE
+       AND a.alertID IS NULL
+     ORDER BY sl.stopSequence;
++----------+--------------+-----------+-------------+--------------+---------+------------+----------+-----------+---------+
+| lineName | stopSequence | stationID | stationName | isAccessible | alertID | alertTitle | severity | startTime | endTime |
++----------+--------------+-----------+-------------+--------------+---------+------------+----------+-----------+---------+
+| Red Line |            2 |      1002 | Belmont     |            1 |    NULL | NULL       | NULL     | NULL      | NULL    |
+| Red Line |            3 |      1003 | Fullerton   |            1 |    NULL | NULL       | NULL     | NULL      | NULL    |
++----------+--------------+-----------+-------------+--------------+---------+------------+----------+-----------+---------+
+2 rows in set (0.001 sec)

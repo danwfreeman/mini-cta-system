@@ -1,0 +1,27 @@
+4) General Query
+
+Show me all alerts that are currently active for a line, can be a train or bus line
+
+For a user that is planning a trip, I want to know if there are any alerts I should be aware of on the Line I'm planning ontaking, can be a bus line or a train line
+
+mysql> SELECT
+       a.alertID,
+       a.title,
+       a.description,
+       a.severity,
+       a.startTime,
+       a.endTime,
+       l.name AS lineName,
+       l.mode AS lineMode
+     FROM Alert a
+     JOIN AlertLine al ON al.alertID = a.alertID
+     JOIN Line l       ON l.lineID = al.lineID
+     WHERE l.name = '8 Halsted'
+       AND '2026-01-23 06:00:00' BETWEEN a.startTime AND a.endTime
+     ORDER BY a.severity, a.startTime;
++---------+-------------------+----------------------------------------------------------------------------+----------+---------------------+---------------------+-----------+----------+
+| alertID | title             | description                                                                | severity | startTime           | endTime             | lineName  | lineMode |
++---------+-------------------+----------------------------------------------------------------------------+----------+---------------------+---------------------+-----------+----------+
+|    4011 | 8 Halsted: detour | Route detoured due to street closure. Temporary stops posted along detour. | info     | 2026-01-23 06:00:00 | 2026-01-23 12:00:00 | 8 Halsted | bus      |
++---------+-------------------+----------------------------------------------------------------------------+----------+---------------------+---------------------+-----------+----------+
+1 row in set (0.001 sec)

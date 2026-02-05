@@ -1,0 +1,27 @@
+3) OLAP
+
+As a user I want to know the mumber of stops on a trip from one the start station to the end station, useful for bus lines
+
+notes:
+- we want to demonstrate an OLAP SUM() query, this could also be achived with a regular count(*) qeury
+
+mysql> SELECT
+       l.name AS lineName,
+       SUM(1)
+     FROM Line l
+     JOIN StationLine sl_from ON sl_from.lineID = l.lineID
+     JOIN StationLine sl_to   ON sl_to.lineID   = l.lineID
+     JOIN StationLine sl_mid  ON sl_mid.lineID  = l.lineID
+     JOIN Station s_from ON s_from.stationID = sl_from.stationID
+     JOIN Station s_to   ON s_to.stationID   = sl_to.stationID
+     WHERE l.name = '66 Chicago'
+       AND s_from.name = 'Michigan/Chicago'
+       AND s_to.name   = 'Shore Drive'
+     AND sl_mid.stopSequence >= sl_from.stopSequence
+     AND sl_mid.stopSequence <= sl_to.stopSequence;
++------------+--------+
+| lineName   | SUM(1) |
++------------+--------+
+| 66 Chicago |      4 |
++------------+--------+
+1 row in set (0.001 sec)

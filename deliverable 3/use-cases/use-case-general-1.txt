@@ -1,0 +1,43 @@
+1) General Query
+
+Show me all the stations in order along a bus line or train line
+
+This is used heavly for to show on UI's the lines visually, ie:
+(consider exporting this to a image and storing the image in the database, with a trigger on lines or stations that when changed, will invalide the image entry and update it)
+
+Red Line
+  o Howard (1001)
+  |
+  o Belmont (1002)
+  |
+  o Fullerton (1003)
+  |
+  o Jackson (1004)
+
+
+
+mysql> CALL sp_get_ordered_line_stops_by_line_name('Blue Line');
++--------+-----------+----------+--------------+-----------+-------------+--------------+
+| lineID | lineName  | lineMode | stopSequence | stationID | stationName | isAccessible |
++--------+-----------+----------+--------------+-----------+-------------+--------------+
+|      2 | Blue Line | train    |            1 |      1007 | O'Hare      |            1 |
+|      2 | Blue Line | train    |            2 |      1006 | Clark/Lake  |            1 |
+|      2 | Blue Line | train    |            3 |      1004 | Jackson     |            1 |
++--------+-----------+----------+--------------+-----------+-------------+--------------+
+3 rows in set (0.002 sec)
+
+Query OK, 0 rows affected (0.002 sec)
+
+mysql> CALL sp_get_ordered_line_stops_by_line_name('Red Line');
++--------+----------+----------+--------------+-----------+---------------+--------------+
+| lineID | lineName | lineMode | stopSequence | stationID | stationName   | isAccessible |
++--------+----------+----------+--------------+-----------+---------------+--------------+
+|      1 | Red Line | train    |            1 |      1001 | Howard        |            1 |
+|      1 | Red Line | train    |            2 |      1002 | Belmont       |            1 |
+|      1 | Red Line | train    |            3 |      1003 | Fullerton     |            1 |
+|      1 | Red Line | train    |            4 |      1004 | Jackson       |            1 |
+|      1 | Red Line | train    |            5 |      1008 | 95th/Dan Ryan |            1 |
++--------+----------+----------+--------------+-----------+---------------+--------------+
+5 rows in set (0.001 sec)
+
+Query OK, 0 rows affected (0.001 sec)

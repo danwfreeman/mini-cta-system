@@ -1,0 +1,26 @@
+6) General Query
+
+As a rider of the system, I want to see all the fares for each rider category with the fare for each
+
+- show me all fares by grouped by rider category
+
+mysql> SELECT
+       fareCategory,
+       MAX(CASE WHEN riderCategory = 'regular' THEN price END) AS regularFare,
+       MAX(CASE WHEN riderCategory = 'reduced' THEN price END) AS reducedFare,
+       MAX(CASE WHEN riderCategory = 'student' THEN price END) AS studentFare
+     FROM Fare
+     GROUP BY fareCategory
+     ORDER BY fareCategory;
++--------------+-------------+-------------+-------------+
+| fareCategory | regularFare | reducedFare | studentFare |
++--------------+-------------+-------------+-------------+
+| bus_cash     |        2.50 |        1.25 |        0.75 |
+| bus_ventra   |        2.25 |        1.10 |        0.75 |
+| ohare_entry  |        5.00 |        1.25 |        0.75 |
+| pass_1_day   |        5.00 |        4.50 |        4.00 |
+| pass_30_day  |       75.00 |       65.00 |       55.00 |
+| pass_7_day   |       20.00 |       18.00 |       15.00 |
+| rail_ventra  |        2.50 |        1.25 |        0.75 |
++--------------+-------------+-------------+-------------+
+7 rows in set (0.001 sec)

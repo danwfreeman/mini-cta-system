@@ -1,0 +1,24 @@
+3) General Query
+
+Show me all alerts that are currently active, system wide
+
+As an operator on the system, I want to know of all the current alerts system wide, their severity and expected end time
+
+
+mysql> SELECT
+       alertID,
+       title,
+       description,
+       severity,
+       startTime,
+       endTime
+     FROM Alert
+     WHERE '2026-01-22 06:10:00' BETWEEN startTime AND endTime
+     ORDER BY severity, startTime;
++---------+-----------------------------+-----------------------------------------------------------------------+----------+---------------------+---------------------+
+| alertID | title                       | description                                                           | severity | startTime           | endTime             |
++---------+-----------------------------+-----------------------------------------------------------------------+----------+---------------------+---------------------+
+|    4009 | 95th/Dan Ryan: station work | Station improvements in progress. Some entrances may be closed.       | info     | 2026-01-18 05:00:00 | 2026-02-02 23:59:00 |
+|    4001 | Red Line: residual delays   | Residual delays due to earlier signal issue. Allow extra travel time. | minor    | 2026-01-22 06:10:00 | 2026-01-22 08:00:00 |
++---------+-----------------------------+-----------------------------------------------------------------------+----------+---------------------+---------------------+
+2 rows in set (0.002 sec)

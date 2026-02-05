@@ -1,0 +1,1 @@
+- average number of stations per line (train or bus)
