@@ -4,7 +4,9 @@ Show me a list of times for station for a particular line for a day of the week 
 
 As a user, I want to see the schedule for a line from a station heading in a particular, I want to now for a 2 hour window what the times will be.
 In this case I want to know the times for the Red Line heading northbound from teh Jackson station on weekdays
-Note, this uses the is peak time function to show the user that these this a peak time schedule 
+
+notes:
+-this uses the is peak time function to show the user that these this a peak time schedule 
 
 
 

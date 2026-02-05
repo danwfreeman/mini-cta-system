@@ -2,6 +2,9 @@
 
 I want to see a rolling average time between arrivals that go back over the last 15 mins for a line at a station for a specific direction 
 (ie a 15min rolling average for wait times)
+This is useful to see if times improve/or degrade throughout the day and a what part of the day.  Would be interesting to compare
+to other dayTypes, such as the weekend or holiday. 
+Would expect to see more variation in bus line service vs the train lines.
 
 notes:
 -this is a window query as we have lead data for each entry of a result set

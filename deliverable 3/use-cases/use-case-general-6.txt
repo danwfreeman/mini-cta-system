@@ -1,8 +1,9 @@
 6) General Query
 
-As a rider of the system, I want to see all the fares for each rider category with the fare for each
-
+As a rider of the system, I want to see all the fares for each rider category with the fare for each:
 - show me all fares grouped by rider category
+
+notes:
 - we use max() here, though it's only used because it's need in conjunction with the group by, 
 since there's only 1 value we could have used any aggregation function
 

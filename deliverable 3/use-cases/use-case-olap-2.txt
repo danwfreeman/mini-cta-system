@@ -1,7 +1,8 @@
 
 2) OLAP
 
-As a user of the system, building on the window 2 query, I want to know the min, max and average trip times
+As an operator of the system, and building on the window 2 query, I want to know the min, max and average trip times, to ensure they do not
+drift too far appart from each other.  This helps maintain a good service level.
 
 
 notes:

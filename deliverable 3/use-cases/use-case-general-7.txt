@@ -1,6 +1,5 @@
 7) General Query
 
-
 As a rider of the system, for a particular line, show me all stations that are accessible and do not have an alert associated with them.
 
 I want to plan a trip and need an elevator at the station, therefore I want to know which stations along my line have a working elevator.

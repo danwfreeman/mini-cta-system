@@ -6,6 +6,7 @@ I would expect to see a considerably higher number of arrival times in peak hour
 
 note: 
 -saturday and sunday_holiday are non peak times, there the values are expected to be 0
+-uses a built in function for determing if the arrival time is in a peak time
 
 mysql> SELECT
        l.mode,                

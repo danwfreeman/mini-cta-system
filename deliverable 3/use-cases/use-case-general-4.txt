@@ -2,7 +2,8 @@
 
 Show me all alerts that are currently active for a line, can be a train or bus line
 
-For a user that is planning a trip, I want to know if there are any alerts I should be aware of on the Line I'm planning ontaking, can be a bus line or a train line
+For a user that is planning a trip, I want to know if there are any alerts I should be aware of on the Line I'm planning ontaking, 
+can be a bus line or a train line
 
 mysql> SELECT
        a.alertID,
