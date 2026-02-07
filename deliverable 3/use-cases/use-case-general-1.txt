@@ -6,6 +6,7 @@ This is used heavly for to show on UI's the lines visually, ie:
 (consider exporting this to a image and storing the image in the database, with a trigger on lines or stations that when changed, will invalide the image entry and update it)
 Since this is accessed by potentially many applications (web, mobile, mcp), centralize here as a stored procedure
 
+ie:
 Red Line
   o Howard (1001)
   |
