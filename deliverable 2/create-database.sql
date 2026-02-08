@@ -10,3 +10,5 @@ CREATE DATABASE IF NOT EXISTS chicago_cta
   DEFAULT COLLATE utf8mb4_unicode_ci;
 
 USE chicago_cta;
+
+show databases;

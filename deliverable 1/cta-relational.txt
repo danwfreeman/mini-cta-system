@@ -5,9 +5,9 @@ Line(lineID PK, name, mode)
 
 Station(stationID PK, name, mode, isAccessible)
 
-StationLine(stationID FK, lineID, stopSequence)
+StationLine(stationID FK, lineID FK, stopSequence)
 
-TimeTable(timetableID PK, lineID, stationID, dayType, timeOfDay, direction)
+TimeTable(timetableID PK, lineID FK, stationID, dayType, timeOfDay, direction)
 
 Fare(fareID PK, fareCategory, riderCategory, price) 
 
