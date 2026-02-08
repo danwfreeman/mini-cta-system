@@ -35,12 +35,28 @@ SELECT
   l.name AS lineName,
   a.alertID,
   a.title,
+  a.description,
   a.severity,
   a.startTime,
   a.endTime
 FROM AlertLine al
 JOIN Line  l ON l.lineID = al.lineID
 JOIN Alert a ON a.alertID = al.alertID;
+
+-- Alerts by station (station name + alert details)
+CREATE OR REPLACE VIEW v_alerts_by_station AS
+SELECT
+  s.stationID,
+  s.name AS stationName,
+  a.alertID,
+  a.title,
+  a.description,
+  a.severity,
+  a.startTime,
+  a.endTime
+FROM AlertStation ast
+JOIN Station s ON s.stationID = ast.stationID
+JOIN Alert   a ON a.alertID = ast.alertID;
 
 -- Line stops - ordered (line name + station name + accessibility)
 CREATE OR REPLACE VIEW v_line_stops AS

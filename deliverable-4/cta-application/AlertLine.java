@@ -4,11 +4,7 @@ public class AlertLine {
     // Database Operations
 
     public static ResultSet fetchAllAlertLinesAsResultSet(Connection conn) throws SQLException {
-        String query = "SELECT al.alertID, a.title AS alertTitle, al.lineID, l.name AS lineName, a.description, a.severity, a.startTime, a.endTime " +
-                        "FROM AlertLine al " +
-                        "JOIN Alert a ON al.alertID = a.alertID " +
-                        "JOIN Line l ON al.lineID = l.lineID " +
-                        "ORDER BY l.name";
+        String query = "SELECT * FROM v_alerts_by_line ORDER BY lineName";
         Statement st = conn.createStatement();
         return st.executeQuery(query);
     }
