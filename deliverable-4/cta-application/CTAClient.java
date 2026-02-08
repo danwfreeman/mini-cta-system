@@ -26,6 +26,10 @@ public class CTAClient extends JFrame {
     private JButton updateStationAlertBtn;
     private int selectedRow = -1;
     private String currentTableType = null; // "alerts", "fares", "linealerts", or "stationalerts"
+    private CardLayout centerCardLayout;
+    private JPanel centerCards;
+    private JPanel lineDetailPanel;
+    private JComboBox<String> lineSelectDropdown;
 
     public CTAClient() {
         super("CTA");
@@ -181,6 +185,25 @@ public class CTAClient extends JFrame {
         JPanel stationAlertsRow = new JPanel();
         stationAlertsRow.add(stationAlertButtonPanel);
 
+        // View Line Detail section
+        lineSelectDropdown = new JComboBox<>();
+        lineSelectDropdown.addActionListener(e -> {
+            if (lineSelectDropdown.getSelectedItem() != null) {
+                onLineSelected((String) lineSelectDropdown.getSelectedItem());
+            }
+        });
+        JPanel lineDetailButtonPanel = new JPanel();
+        lineDetailButtonPanel.add(new JLabel("Select a Line:"));
+        lineDetailButtonPanel.add(lineSelectDropdown);
+
+        JPanel lineDetailRow = new JPanel();
+        lineDetailRow.add(lineDetailButtonPanel);
+
+        // Line detail vertical display panel
+        lineDetailPanel = new JPanel();
+        lineDetailPanel.setLayout(new BoxLayout(lineDetailPanel, BoxLayout.Y_AXIS));
+        JScrollPane lineDetailScroll = new JScrollPane(lineDetailPanel);
+
         // CardLayout to swap button rows
         CardLayout cardLayout = new CardLayout();
         JPanel buttonCards = new JPanel(cardLayout);
@@ -188,12 +211,26 @@ public class CTAClient extends JFrame {
         buttonCards.add(alertsRow, "Manage Alerts");
         buttonCards.add(lineAlertsRow, "Manage Line Alerts");
         buttonCards.add(stationAlertsRow, "Manage Station Alerts");
+        buttonCards.add(lineDetailRow, "View Line Detail");
+
+        // CardLayout to swap center content between table and line detail
+        centerCardLayout = new CardLayout();
+        centerCards = new JPanel(centerCardLayout);
+        centerCards.add(resultScroll, "table");
+        centerCards.add(lineDetailScroll, "linedetail");
 
         JComboBox<String> manageDropdown = new JComboBox<>(new String[]{
-            "Manage Fares", "Manage Alerts", "Manage Line Alerts", "Manage Station Alerts"
+            "Manage Fares", "Manage Alerts", "Manage Line Alerts", "Manage Station Alerts", "View Line Detail"
         });
         manageDropdown.addActionListener(e -> {
-            cardLayout.show(buttonCards, (String) manageDropdown.getSelectedItem());
+            String selected = (String) manageDropdown.getSelectedItem();
+            cardLayout.show(buttonCards, selected);
+            if ("View Line Detail".equals(selected)) {
+                centerCardLayout.show(centerCards, "linedetail");
+                loadLineDropdown();
+            } else {
+                centerCardLayout.show(centerCards, "table");
+            }
         });
 
         JPanel dropdownRow = new JPanel();
@@ -209,7 +246,7 @@ public class CTAClient extends JFrame {
         topPanel.add(topButtonsPanel, BorderLayout.SOUTH);
 
         add(topPanel, BorderLayout.NORTH);
-        add(resultScroll, BorderLayout.CENTER);
+        add(centerCards, BorderLayout.CENTER);
     }
 
     private void onShowAlerts(ActionEvent e) {
@@ -669,6 +706,88 @@ public class CTAClient extends JFrame {
         });
 
         dialog.setVisible(true);
+    }
+
+    private void loadLineDropdown() {
+        try {
+            lineSelectDropdown.removeAllItems();
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery("SELECT name FROM Line ORDER BY name");
+            while (rs.next()) {
+                lineSelectDropdown.addItem(rs.getString("name"));
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error loading lines: " + ex.getMessage(), "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void onLineSelected(String lineName) {
+        try {
+            CallableStatement cs = conn.prepareCall("{CALL sp_get_ordered_line_stops_by_line_name(?)}");
+            cs.setString(1, lineName);
+            ResultSet rs = cs.executeQuery();
+            renderLineDetail(rs, lineName);
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error loading line detail: " + ex.getMessage(), "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void renderLineDetail(ResultSet rs, String lineName) throws SQLException {
+        lineDetailPanel.removeAll();
+
+        lineDetailPanel.add(Box.createVerticalStrut(20));
+
+        // Line title
+        JLabel titleLabel = new JLabel(lineName);
+        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 22));
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lineDetailPanel.add(titleLabel);
+        lineDetailPanel.add(Box.createVerticalStrut(15));
+
+        int stopNum = 0;
+        while (rs.next()) {
+            stopNum++;
+            String stationName = rs.getString("stationName");
+            boolean accessible = rs.getBoolean("isAccessible");
+
+            // Connector line between stops (skip before first)
+            if (stopNum > 1) {
+                JLabel connectorTop = new JLabel("●");
+                connectorTop.setFont(new Font("Monospaced", Font.PLAIN, 12));
+                connectorTop.setAlignmentX(Component.CENTER_ALIGNMENT);
+                lineDetailPanel.add(connectorTop);
+
+                JLabel connector = new JLabel("│");
+                connector.setFont(new Font("Monospaced", Font.PLAIN, 20));
+                connector.setAlignmentX(Component.CENTER_ALIGNMENT);
+                lineDetailPanel.add(connector);
+
+                JLabel connectorBottom = new JLabel("●");
+                connectorBottom.setFont(new Font("Monospaced", Font.PLAIN, 12));
+                connectorBottom.setAlignmentX(Component.CENTER_ALIGNMENT);
+                lineDetailPanel.add(connectorBottom);
+            }
+
+            // Station dot and name
+            String accessibleIcon = accessible ? "  ♿" : "";
+            JLabel stationLabel = new JLabel(stationName + accessibleIcon);
+            stationLabel.setFont(new Font("SansSerif", Font.PLAIN, 16));
+            stationLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            lineDetailPanel.add(stationLabel);
+        }
+
+        if (stopNum == 0) {
+            JLabel emptyLabel = new JLabel("No stops found for this line.");
+            emptyLabel.setFont(new Font("SansSerif", Font.ITALIC, 14));
+            emptyLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            lineDetailPanel.add(emptyLabel);
+        }
+
+        lineDetailPanel.add(Box.createVerticalStrut(20));
+        lineDetailPanel.revalidate();
+        lineDetailPanel.repaint();
     }
 
     private void populateTable(ResultSet rs) throws SQLException {

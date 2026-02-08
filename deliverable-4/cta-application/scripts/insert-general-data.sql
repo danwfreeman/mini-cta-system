@@ -23,20 +23,20 @@ INSERT INTO Line (lineID, name, mode) VALUES
 
 -- Rail station names based on CTA 'L' system map (plus a few bus stops)
 INSERT INTO Station (stationID, name, mode, isAccessible) VALUES
-(1001, 'Howard',            'train', TRUE),
+(1001, 'Howard',            'train', FALSE),
 (1002, 'Belmont',           'train', TRUE),
-(1003, 'Fullerton',         'train', TRUE),
+(1003, 'Fullerton',         'train', FALSE),
 (1004, 'Jackson',           'train', TRUE),
 (1005, 'Roosevelt',         'train', TRUE),
-(1006, 'Clark/Lake',        'train', TRUE),
+(1006, 'Clark/Lake',        'train', FALSE),
 (1007, 'O''Hare',           'train', TRUE),
 (1008, '95th/Dan Ryan',     'train', TRUE),
 (1009, 'Cermak-Chinatown',  'train', TRUE),
 (1010, 'Sox-35th',          'train', TRUE),
 (1011, 'Halsted/79th',      'bus',   FALSE),
-(1012, 'Broadway/Waveland', 'bus',   TRUE),
+(1012, 'Broadway/Waveland', 'bus',   FALSE),
 (1013, 'Ashland/63rd',      'bus',   TRUE),
-(1014, 'Michigan/Chicago',  'bus',   TRUE),
+(1014, 'Michigan/Chicago',  'bus',   FALSE),
 (1015, 'Navy Pier Terminal','bus',   TRUE);
 
 INSERT INTO Station (stationID, name, mode, isAccessible) VALUES
@@ -67,8 +67,30 @@ INSERT INTO StationLine (stationID, lineID, stopSequence) VALUES
 (1005, 10, 2),  -- Roosevelt (common transfer area as a “stop” conceptually)
 (1014, 10, 3),  -- Michigan/Chicago (downtown-ish)
 
+-- Bus 20 Madison
+(1011, 11, 1),  -- Halsted/79th
+(1012, 11, 2),  -- Broadway/Waveland (route info page terminals)
+(1013, 11, 3),  -- (representing a mid-route major intersection)
+
+-- Bus 22 Clark
+(1011, 12, 1),  -- Halsted/79th
+(1015, 12, 2),  -- Broadway/Waveland (route info page terminals)
+(1013, 12, 3),  -- (representing a mid-route major intersection)
+
+
+-- Bus 36 Broadway
+(1011, 13, 1),  -- Halsted/79th
+(1012, 13, 2),  -- Broadway/Waveland (route info page terminals)
+(1013, 13, 3),  -- (representing a mid-route major intersection)
+(1004, 13, 4),  -- L stop, Red
+(1006, 13, 5),  -- L stop, Blue
+
+
 -- Bus 151 Sheridan
-(1014, 15, 1);  -- Michigan/Chicago
+(1014, 15, 1),  -- Michigan/Chicago
+(1015, 15, 2),  -- Navy Pier Terminal
+(1016, 15, 3),  -- Huron
+(1017, 15, 4);  -- Shore Drive
 
 INSERT INTO StationLine (stationID, lineID, stopSequence) VALUES
 -- Brown Line (train)

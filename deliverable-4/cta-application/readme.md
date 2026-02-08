@@ -24,6 +24,9 @@ From the website https://www.transitchicago.com/ this program has created sample
 
 - unzip cta.zip to a directory a directory, eg './cta'
 - from within root for './cta'
+- first compile the java files into platform independent byte code
+- `javac CTAClient.java`
+- run the GUI application (note classpath entry to mysql jdbc driver)
 - `java -cp .:lib/mysql-connector-java.jar CTAClient`
 
 
@@ -43,6 +46,7 @@ From the website https://www.transitchicago.com/ this program has created sample
 
 - Fares
     - show all fares
-    - add new fare categories
+    - add new fare entry (can add a new fare category as well)
     - modify any fare entry
+    - delete any fare entry
     - ensures the are no duplicate fare and rider catergory entries (at the database layer)

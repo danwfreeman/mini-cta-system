@@ -1,5 +1,5 @@
 USE chicago_cta;
--- since we call this oftent to get the maps of the lines in the UI, we want to offload the ordering of the sequence to the database
+-- since we call this often to get the maps of the lines in the UI, we want to offload the ordering of the sequence to the database
 DELIMITER $$
 
 CREATE PROCEDURE sp_get_ordered_line_stops_by_line_name (
