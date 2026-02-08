@@ -36,6 +36,7 @@ CREATE TABLE StationLine (
   lineID INT NOT NULL,
   stopSequence SMALLINT NOT NULL,
   PRIMARY KEY (stationID, lineID),
+  UNIQUE KEY uq_stationline_line_sequence (lineID, stopSequence),
   CONSTRAINT fk_stationline_station
     FOREIGN KEY (stationID) REFERENCES Station(stationID)
     ON UPDATE CASCADE
@@ -49,13 +50,14 @@ CREATE TABLE StationLine (
 
 -- TimeTable
 CREATE TABLE TimeTable (
-  timetableID INT NOT NULL,
+  timetableID INT NOT NULL AUTO_INCREMENT,
   lineID INT NOT NULL,
   stationID INT NOT NULL,
   dayType ENUM('weekday','saturday','sunday_holiday'),
   timeOfDay TIME NOT NULL,
   direction ENUM('northbound','southbound','eastbound','westbound'),
   PRIMARY KEY (timetableID),
+  UNIQUE KEY uq_timetable_line_station_day_dir_time (lineID, stationID, dayType, direction, timeOfDay),
   CONSTRAINT fk_timetable_line
     FOREIGN KEY (lineID) REFERENCES Line(lineID)
     ON UPDATE CASCADE

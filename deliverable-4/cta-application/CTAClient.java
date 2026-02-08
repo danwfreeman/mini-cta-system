@@ -429,8 +429,8 @@ public class CTAClient extends JFrame {
 
         try {
             DefaultTableModel model = (DefaultTableModel) resultTable.getModel();
-            int alertId = Integer.parseInt(model.getValueAt(selectedRow, 0).toString());
-            int lineId = Integer.parseInt(model.getValueAt(selectedRow, 2).toString());
+            int lineId = Integer.parseInt(model.getValueAt(selectedRow, 0).toString());
+            int alertId = Integer.parseInt(model.getValueAt(selectedRow, 2).toString());
 
             AlertLine.deleteAlertLine(conn, alertId, lineId);
             JOptionPane.showMessageDialog(this, "Line alert deleted successfully");
@@ -452,8 +452,8 @@ public class CTAClient extends JFrame {
 
         try {
             DefaultTableModel model = (DefaultTableModel) resultTable.getModel();
-            int alertId = Integer.parseInt(model.getValueAt(selectedRow, 0).toString());
-            int lineId = Integer.parseInt(model.getValueAt(selectedRow, 2).toString());
+            int lineId = Integer.parseInt(model.getValueAt(selectedRow, 0).toString());
+            int alertId = Integer.parseInt(model.getValueAt(selectedRow, 2).toString());
 
             AlertLine.showDialog(this, conn, alertId, lineId, false, () -> onShowLineAlerts(null));
         } catch (SQLException ex) {
@@ -497,8 +497,8 @@ public class CTAClient extends JFrame {
 
         try {
             DefaultTableModel model = (DefaultTableModel) resultTable.getModel();
-            int alertId = Integer.parseInt(model.getValueAt(selectedRow, 0).toString());
-            int stationId = Integer.parseInt(model.getValueAt(selectedRow, 2).toString());
+            int stationId = Integer.parseInt(model.getValueAt(selectedRow, 0).toString());
+            int alertId = Integer.parseInt(model.getValueAt(selectedRow, 2).toString());
 
             AlertStation.deleteAlertStation(conn, alertId, stationId);
             JOptionPane.showMessageDialog(this, "Station alert deleted successfully");
@@ -520,8 +520,8 @@ public class CTAClient extends JFrame {
 
         try {
             DefaultTableModel model = (DefaultTableModel) resultTable.getModel();
-            int alertId = Integer.parseInt(model.getValueAt(selectedRow, 0).toString());
-            int stationId = Integer.parseInt(model.getValueAt(selectedRow, 2).toString());
+            int stationId = Integer.parseInt(model.getValueAt(selectedRow, 0).toString());
+            int alertId = Integer.parseInt(model.getValueAt(selectedRow, 2).toString());
 
             AlertStation.showDialog(this, conn, alertId, stationId, false, () -> onShowStationAlerts(null));
         } catch (SQLException ex) {

@@ -6,7 +6,7 @@ public class AlertLine {
     // Database Operations
 
     public static ResultSet fetchAllAlertLinesAsResultSet(Connection conn) throws SQLException {
-        String query = "SELECT * FROM v_alerts_by_line ORDER BY lineName";
+        String query = "SELECT * FROM v_alerts_by_line ORDER BY title";
         Statement st = conn.createStatement();
         return st.executeQuery(query);
     }

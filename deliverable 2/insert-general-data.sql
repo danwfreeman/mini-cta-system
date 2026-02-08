@@ -126,7 +126,6 @@ INSERT INTO TimeTable (timetableID, lineID, stationID, dayType, timeOfDay, direc
 
 (2011, 9, 1011, 'weekday',        '05:10:00', 'northbound'),
 (2012, 9, 1012, 'weekday',        '05:55:00', 'southbound'),
-(2013, 10,1013, 'weekday',        '07:30:00', 'northbound'),
 (2014, 15,1014, 'saturday',       '12:20:00', 'northbound'),
 (2015, 14,1015, 'sunday_holiday', '14:05:00', 'eastbound');
 

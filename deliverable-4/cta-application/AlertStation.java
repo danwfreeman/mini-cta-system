@@ -6,7 +6,7 @@ public class AlertStation {
     // Database Operations
 
     public static ResultSet fetchAllAlertStationsAsResultSet(Connection conn) throws SQLException {
-        String query = "SELECT * FROM v_alerts_by_station ORDER BY stationName";
+        String query = "SELECT * FROM v_alerts_by_station ORDER BY title";
         Statement st = conn.createStatement();
         return st.executeQuery(query);
     }

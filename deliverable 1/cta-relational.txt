@@ -7,7 +7,7 @@ Station(stationID PK, name, mode, isAccessible)
 
 StationLine(stationID FK, lineID FK, stopSequence)
 
-TimeTable(timetableID PK, lineID FK, stationID, dayType, timeOfDay, direction)
+TimeTable(timetableID PK, lineID FK, stationID FK, dayType, timeOfDay, direction)
 
 Fare(fareID PK, fareCategory, riderCategory, price) 
 
@@ -109,10 +109,6 @@ stationID INT PK NOT NULL
 
 
 
-
-
-
-
 Data Identification and Semantics:
 
 Fare: Describes the cost of using the CTA service
@@ -126,16 +122,16 @@ for a station alert, a typical use case would an out of service elevator
 an alert can apply to many lines and a line can have many alerts (AlertLine)
 an alert can apply to many stations and a station can have many alerts (AlertStation)
 
-Line: is either a L (train) line or a bus line.  The mode attribute designates each as an enumeration: (Train, Bus)
+Line: is either a L (train) line or a bus line. The mode attribute designates each as an enumeration: ('train','bus')
 
-Station, StationLine: applies to either a train station or a bus stop, the mode attribute designates each as an enumeration: (Train, Bus)
+Station, StationLine: applies to either a train station or a bus stop, the mode attribute designates each as an enumeration: ('train','bus')
 if station can accomodate a wheelchair it's designated as isAccessible=true
 a station can be used by more than one line, ie the red line and brown line (plus others) pass through the Clark/Lake station
 a line can have many stations and a station can have many lines (StationLine)
 
 TimeTable: a list of times for pickup at each station for each line
-the times change based on direction, a line can only have 2 directions either (NorthBound or SouthBound) or similarly (EastBound or WestBound)
-the dayType describes: weekdays, Saturday or Sunday/Holiday as each respective dayType has it's own schedule
+the times change based on direction, a line can only have 2 directions either (northbound or southbound) or similarly (eastbound or westbound)
+the dayType describes: weekdays, saturday or sunday_holiday as each respective dayType has its own schedule
 timeOfDay is the actual time the services will be at the respective station, ie 3:55pm
 
 
@@ -150,9 +146,12 @@ Uniqueness constraints:
 StationLine: Unique(lineID, stopSequence): a line cannot have 2 stops with the same stopSequence
 TimeTable: Unique(lineID, stationID, dayType, direction, timeOfDay):  cannot of 2 time entries a specific, lineID, stationID, dayType, direction
 
+If a row is deleted from Alert, then the associated row(s) are removed from the respective AlertLine and AlertStation tables
+
 Not Null constraints:
 All Primary Keys are Not Null
-All Foriegn Keys are Not Null
+All Foreign Keys are Not Null
+In the DDL, dayType and direction are nullable (not declared NOT NULL)
 
 Alert:
 An alert is considered systemwide when it has no associated records in either AlertLine or AlertStation.
@@ -166,7 +165,7 @@ AlertLine.lineID
 
 AlertStation.alertID
 AlertStation.stationID
-Each AlertStation row must reference exactly one Alert and one Station
+ Each AlertStation row must reference exactly one Alert and one Station
 
 TimeTable.lineID
 TimeTable.stationID
