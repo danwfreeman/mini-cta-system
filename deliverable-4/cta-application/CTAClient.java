@@ -7,6 +7,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,7 +28,7 @@ public class CTAClient extends JFrame {
     private String currentTableType = null; // "alerts", "fares", "linealerts", or "stationalerts"
 
     public CTAClient() {
-        super("CTA MySQL Client");
+        super("CTA");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(2000, 1200);
         setLayout(new BorderLayout());
@@ -711,6 +714,15 @@ public class CTAClient extends JFrame {
                 case "endtime":
                     colNames[i] = "End Time";
                     break;
+                case "description":
+                    colNames[i] = "Description";
+                    break;
+                case "severity":
+                    colNames[i] = "Severity";
+                    break;
+                case "title":
+                    colNames[i] = "Alert Title";
+                    break;
                 default:
                     colNames[i] = dbCol;
             }
@@ -741,7 +753,7 @@ public class CTAClient extends JFrame {
 
     private void showAlertDialog(Alert alert, int alertId, boolean isCreate) throws SQLException {
         JDialog dialog = new JDialog(this, isCreate ? "Create Alert" : "Update Alert", true);
-        dialog.setSize(400, 300);
+        dialog.setSize(500, 350);
         dialog.setLocationRelativeTo(this);
         dialog.setLayout(new GridBagLayout());
 
@@ -749,48 +761,71 @@ public class CTAClient extends JFrame {
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.anchor = GridBagConstraints.WEST;
 
-        // Get column names from Alert table metadata
-        ResultSetMetaData md = Alert.getAlertTableMetadata(conn);
-        int columnCount = md.getColumnCount();
-
         Map<String, JTextField> fieldMap = new HashMap<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         int fieldIndex = 0;
 
-        for (int i = 1; i <= columnCount; i++) {
-            String columnName = md.getColumnLabel(i);
+        // Title
+        gbc.gridx = 0;
+        gbc.gridy = fieldIndex;
+        dialog.add(new JLabel("Title:"), gbc);
+        gbc.gridx = 1;
+        JTextField titleField = new JTextField(!isCreate && alert.getTitle() != null ? alert.getTitle() : "", 20);
+        fieldMap.put("Title", titleField);
+        dialog.add(titleField, gbc);
+        fieldIndex++;
 
-            // Skip alertID (it's the primary key)
-            if (columnName.equalsIgnoreCase("alertID")) {
-                continue;
-            }
+        // Description
+        gbc.gridx = 0;
+        gbc.gridy = fieldIndex;
+        dialog.add(new JLabel("Description:"), gbc);
+        gbc.gridx = 1;
+        JTextField descField = new JTextField(!isCreate && alert.getDescription() != null ? alert.getDescription() : "", 20);
+        fieldMap.put("Description", descField);
+        dialog.add(descField, gbc);
+        fieldIndex++;
 
-            gbc.gridx = 0;
-            gbc.gridy = fieldIndex;
-            dialog.add(new JLabel(columnName + ":"), gbc);
-
-            gbc.gridx = 1;
-            String value = "";
-
-            if (!isCreate) {
-                // Get value from Alert object
-                if (columnName.equalsIgnoreCase("title"))
-                    value = alert.getTitle() == null ? "" : alert.getTitle();
-                else if (columnName.equalsIgnoreCase("description"))
-                    value = alert.getDescription() == null ? "" : alert.getDescription();
-                else if (columnName.equalsIgnoreCase("startTime"))
-                    value = alert.getStartTime() == null ? "" : alert.getStartTime();
-                else if (columnName.equalsIgnoreCase("endTime"))
-                    value = alert.getEndTime() == null ? "" : alert.getEndTime();
-                else if (columnName.equalsIgnoreCase("severity"))
-                    value = alert.getSeverity() == null ? "" : alert.getSeverity();
-            }
-
-            JTextField field = new JTextField(value, 20);
-            fieldMap.put(columnName, field);
-            dialog.add(field, gbc);
-
-            fieldIndex++;
+        // Start Time spinner
+        gbc.gridx = 0;
+        gbc.gridy = fieldIndex;
+        dialog.add(new JLabel("Start Time:"), gbc);
+        gbc.gridx = 1;
+        Date startDate = new Date();
+        if (!isCreate && alert.getStartTime() != null) {
+            try { startDate = sdf.parse(alert.getStartTime()); } catch (Exception ignored) {}
         }
+        SpinnerDateModel startModel = new SpinnerDateModel(startDate, null, null, Calendar.MINUTE);
+        JSpinner startSpinner = new JSpinner(startModel);
+        startSpinner.setEditor(new JSpinner.DateEditor(startSpinner, "yyyy-MM-dd HH:mm:ss"));
+        dialog.add(startSpinner, gbc);
+        fieldIndex++;
+
+        // End Time spinner
+        gbc.gridx = 0;
+        gbc.gridy = fieldIndex;
+        dialog.add(new JLabel("End Time:"), gbc);
+        gbc.gridx = 1;
+        Date endDate = new Date();
+        if (!isCreate && alert.getEndTime() != null) {
+            try { endDate = sdf.parse(alert.getEndTime()); } catch (Exception ignored) {}
+        }
+        SpinnerDateModel endModel = new SpinnerDateModel(endDate, null, null, Calendar.MINUTE);
+        JSpinner endSpinner = new JSpinner(endModel);
+        endSpinner.setEditor(new JSpinner.DateEditor(endSpinner, "yyyy-MM-dd HH:mm:ss"));
+        dialog.add(endSpinner, gbc);
+        fieldIndex++;
+
+        // Severity
+        gbc.gridx = 0;
+        gbc.gridy = fieldIndex;
+        dialog.add(new JLabel("Severity:"), gbc);
+        gbc.gridx = 1;
+        JComboBox<String> severityCombo = new JComboBox<>(new String[]{"info", "minor", "major", "critical"});
+        if (!isCreate && alert.getSeverity() != null) {
+            severityCombo.setSelectedItem(alert.getSeverity());
+        }
+        dialog.add(severityCombo, gbc);
+        fieldIndex++;
 
         JButton saveBtn = new JButton("Save");
         gbc.gridx = 0;
@@ -804,6 +839,9 @@ public class CTAClient extends JFrame {
                 for (String columnName : fieldMap.keySet()) {
                     fieldValues.put(columnName, fieldMap.get(columnName).getText());
                 }
+                fieldValues.put("startTime", sdf.format(startSpinner.getValue()));
+                fieldValues.put("endTime", sdf.format(endSpinner.getValue()));
+                fieldValues.put("severity", (String) severityCombo.getSelectedItem());
 
                 if (isCreate) {
                     Alert.createAlert(conn, fieldValues);
@@ -831,44 +869,40 @@ public class CTAClient extends JFrame {
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.anchor = GridBagConstraints.WEST;
 
-        // Get column names from Fare table metadata
-        ResultSetMetaData md = Fare.getFareTableMetadata(conn);
-        int columnCount = md.getColumnCount();
-
         Map<String, JTextField> fieldMap = new HashMap<>();
         int fieldIndex = 0;
 
-        for (int i = 1; i <= columnCount; i++) {
-            String columnName = md.getColumnLabel(i);
+        // Fare Category
+        gbc.gridx = 0;
+        gbc.gridy = fieldIndex;
+        dialog.add(new JLabel("Fare Category:"), gbc);
+        gbc.gridx = 1;
+        JTextField fareCategoryField = new JTextField(!isCreate && fare.getFareCategory() != null ? fare.getFareCategory() : "", 20);
+        fieldMap.put("fareCategory", fareCategoryField);
+        dialog.add(fareCategoryField, gbc);
+        fieldIndex++;
 
-            // Skip fareID (it's the primary key)
-            if (columnName.equalsIgnoreCase("fareID")) {
-                continue;
-            }
-
-            gbc.gridx = 0;
-            gbc.gridy = fieldIndex;
-            dialog.add(new JLabel(columnName + ":"), gbc);
-
-            gbc.gridx = 1;
-            String value = "";
-
-            if (!isCreate) {
-                // Get value from Fare object
-                if (columnName.equalsIgnoreCase("fareCategory"))
-                    value = fare.getFareCategory() == null ? "" : fare.getFareCategory();
-                else if (columnName.equalsIgnoreCase("riderCategory"))
-                    value = fare.getRiderCategory() == null ? "" : fare.getRiderCategory();
-                else if (columnName.equalsIgnoreCase("price"))
-                    value = String.valueOf(fare.getPrice());
-            }
-
-            JTextField field = new JTextField(value, 20);
-            fieldMap.put(columnName, field);
-            dialog.add(field, gbc);
-
-            fieldIndex++;
+        // Rider Category dropdown
+        gbc.gridx = 0;
+        gbc.gridy = fieldIndex;
+        dialog.add(new JLabel("Rider Category:"), gbc);
+        gbc.gridx = 1;
+        JComboBox<String> riderCategoryCombo = new JComboBox<>(new String[]{"regular", "reduced", "student"});
+        if (!isCreate && fare.getRiderCategory() != null) {
+            riderCategoryCombo.setSelectedItem(fare.getRiderCategory());
         }
+        dialog.add(riderCategoryCombo, gbc);
+        fieldIndex++;
+
+        // Price
+        gbc.gridx = 0;
+        gbc.gridy = fieldIndex;
+        dialog.add(new JLabel("Price:"), gbc);
+        gbc.gridx = 1;
+        JTextField priceField = new JTextField(!isCreate ? String.valueOf(fare.getPrice()) : "", 20);
+        fieldMap.put("price", priceField);
+        dialog.add(priceField, gbc);
+        fieldIndex++;
 
         JButton saveBtn = new JButton("Save");
         gbc.gridx = 0;
@@ -882,6 +916,7 @@ public class CTAClient extends JFrame {
                 for (String columnName : fieldMap.keySet()) {
                     fieldValues.put(columnName, fieldMap.get(columnName).getText());
                 }
+                fieldValues.put("riderCategory", (String) riderCategoryCombo.getSelectedItem());
 
                 if (isCreate) {
                     Fare.createFare(conn, fieldValues);
@@ -891,7 +926,13 @@ public class CTAClient extends JFrame {
                 dialog.dispose();
                 onShowFares(null);
             } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(dialog, "Error saving fare: " + ex.getMessage(), "Error",
+                JOptionPane.showMessageDialog(dialog, "Database error: " + ex.getMessage(), "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(dialog, "Invalid number format: " + ex.getMessage(), "Validation Error",
+                        JOptionPane.WARNING_MESSAGE);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(dialog, "Unexpected error: " + ex.getMessage(), "Error",
                         JOptionPane.ERROR_MESSAGE);
             }
         });

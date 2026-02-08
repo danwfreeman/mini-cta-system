@@ -169,59 +169,38 @@ INSERT INTO Fare (fareID, fareCategory, riderCategory, price) VALUES
 
 -- Mock service + elevator-style alerts, with Jan 2026 timestamps
 INSERT INTO Alert (alertID, title, description, startTime, endTime, severity) VALUES
-(4001, 'Red Line: residual delays', 'Residual delays due to earlier signal issue. Allow extra travel time.', '2026-01-22 06:10:00', '2026-01-22 08:00:00', 'minor'),
-(4002, 'Blue Line: service disruption near O''Hare', 'Trains operating with delays near O''Hare. Consider alternate service.', '2026-01-23 15:20:00', '2026-01-23 17:10:00', 'major'),
-(4003, 'Brown Line: reroute in Loop', 'Trains rerouted around the Loop due to track work. Check platform signage.', '2026-01-24 09:00:00', '2026-01-24 15:00:00', 'info'),
-(4004, 'Green Line: single tracking', 'Single tracking between stations due to maintenance. Expect delays.', '2026-01-21 10:30:00', '2026-01-21 13:30:00', 'minor'),
-(4005, 'Orange Line: late-night construction', 'Late-night service impacts due to planned construction.', '2026-01-24 22:00:00', '2026-01-25 04:00:00', 'info'),
+(4001, 'Residual delays', 'Residual delays due to earlier signal issue. Allow extra travel time.', '2026-01-22 06:10:00', '2026-01-22 08:00:00', 'minor'),
+(4002, 'Service disruption near O''Hare', 'Trains operating with delays near O''Hare. Consider alternate service.', '2026-01-23 15:20:00', '2026-01-23 17:10:00', 'major'),
+(4003, 'Reroute in Loop', 'Trains rerouted around the Loop due to track work. Check platform signage.', '2026-01-24 09:00:00', '2026-01-24 15:00:00', 'info'),
+(4004, 'Single tracking', 'Single tracking between stations due to maintenance. Expect delays.', '2026-01-21 10:30:00', '2026-01-21 13:30:00', 'minor'),
+(4005, 'Late-night construction', 'Late-night service impacts due to planned construction.', '2026-01-24 22:00:00', '2026-01-25 04:00:00', 'info'),
 
-(4006, 'Clark/Lake: elevator outage', 'Elevator temporarily out of service. Use alternate accessible station if needed.', '2026-01-20 07:00:00', '2026-01-20 18:00:00', 'minor'),
-(4007, 'Jackson: escalator maintenance', 'Escalator maintenance underway. Use stairs or alternate route.', '2026-01-19 08:00:00', '2026-01-19 16:00:00', 'info'),
-(4008, 'Roosevelt: platform crowding', 'Platform crowding expected due to special event. Allow extra time.', '2026-01-23 18:00:00', '2026-01-23 21:30:00', 'major'),
-(4009, '95th/Dan Ryan: station work', 'Station improvements in progress. Some entrances may be closed.', '2026-01-18 05:00:00', '2026-02-02 23:59:00', 'info'),
-(4010, 'Howard: track inspection', 'Track inspection in progress; trains may operate at reduced speeds.', '2026-01-22 11:00:00', '2026-01-22 14:30:00', 'minor'),
+(4006, 'Elevator outage', 'Elevator temporarily out of service. Use alternate accessible station if needed.', '2026-01-20 07:00:00', '2026-01-20 18:00:00', 'minor'),
+(4007, 'Escalator maintenance', 'Escalator maintenance underway. Use stairs or alternate route.', '2026-01-19 08:00:00', '2026-01-19 16:00:00', 'info'),
+(4008, 'Platform crowding', 'Platform crowding expected due to special event. Allow extra time.', '2026-01-23 18:00:00', '2026-01-23 21:30:00', 'major'),
+(4009, 'Station work', 'Station improvements in progress. Some entrances may be closed.', '2026-01-18 05:00:00', '2026-02-02 23:59:00', 'info'),
+(4010, 'Track inspection', 'Track inspection in progress; trains may operate at reduced speeds.', '2026-01-22 11:00:00', '2026-01-22 14:30:00', 'minor'),
 
-(4011, '8 Halsted: detour', 'Route detoured due to street closure. Temporary stops posted along detour.', '2026-01-23 06:00:00', '2026-01-23 12:00:00', 'info'),
-(4012, '9 Ashland: delays', 'Buses experiencing delays due to traffic congestion.', '2026-01-24 07:30:00', '2026-01-24 10:30:00', 'minor'),
-(4013, '22 Clark: stop skipped', 'One stop temporarily skipped due to construction; use nearby stop.', '2026-01-21 09:00:00', '2026-01-21 17:00:00', 'info'),
-(4014, '151 Sheridan: heavy ridership', 'Heavy ridership expected; extra buses may be added as needed.', '2026-01-24 12:00:00', '2026-01-24 18:00:00', 'minor'),
-(4015, '66 Chicago: weather-related delays', 'Weather conditions may cause delays. Use trackers for arrivals.', '2026-01-22 15:00:00', '2026-01-22 20:00:00', 'major');
+(4011, 'Street Detour', 'Route detoured due to street closure. Temporary stops posted along detour.', '2026-01-23 06:00:00', '2026-01-23 12:00:00', 'info'),
+(4012, 'Busdelays', 'Buses experiencing delays due to traffic congestion.', '2026-01-24 07:30:00', '2026-01-24 10:30:00', 'minor'),
+(4013, 'Stop skipped', 'One stop temporarily skipped due to construction; use nearby stop.', '2026-01-21 09:00:00', '2026-01-21 17:00:00', 'info'),
+(4014, 'Heavy ridership', 'Heavy ridership expected; extra buses may be added as needed.', '2026-01-24 12:00:00', '2026-01-24 18:00:00', 'minor'),
+(4015, 'Weather-related delays', 'Weather conditions may cause delays. Use trackers for arrivals.', '2026-01-22 15:00:00', '2026-01-22 20:00:00', 'major');
 
 
 -- One line association per alert 
 INSERT INTO AlertLine (alertID, lineID) VALUES
 (4001, 1),
 (4002, 2),
-(4003, 3),
-(4004, 4),
-(4005, 5),
-(4006, 2),
-(4007, 1),
-(4008, 1),
-(4009, 1),
 (4010, 1),
 (4011, 9),
-(4012, 10),
-(4013, 12),
-(4014, 15),
 (4015, 14);
 
 -- One station association per alert 
 INSERT INTO AlertStation (alertID, stationID) VALUES
-(4001, 1004), -- Jackson
-(4002, 1007), -- O'Hare
-(4003, 1006), -- Clark/Lake (Loop area)
-(4004, 1006), -- Clark/Lake (transfer impact)
-(4005, 1005), -- Roosevelt (as a major transfer)
-(4006, 1006), -- Clark/Lake
 (4007, 1004), -- Jackson
 (4008, 1005), -- Roosevelt
 (4009, 1008), -- 95th/Dan Ryan
-(4010, 1001), -- Howard
-(4011, 1011), -- Halsted/79th
-(4012, 1013), -- Ashland/63rd
-(4013, 1014), -- Michigan/Chicago
-(4014, 1012), -- Broadway/Waveland
 (4015, 1015); -- Navy Pier Terminal
 
 COMMIT;

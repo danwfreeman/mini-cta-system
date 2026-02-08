@@ -1,8 +1,8 @@
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 public class Alert {
     private int alertID;
@@ -29,71 +29,27 @@ public class Alert {
         return alertID;
     }
 
-    public void setAlertID(int alertID) {
-        this.alertID = alertID;
-    }
-
     public String getTitle() {
         return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public String getStartTime() {
         return startTime;
-    }
-
-    public void setStartTime(String startTime) {
-        this.startTime = startTime;
     }
 
     public String getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(String endTime) {
-        this.endTime = endTime;
-    }
-
     public String getSeverity() {
         return severity;
     }
 
-    public void setSeverity(String severity) {
-        this.severity = severity;
-    }
-
     // Database Operations
-    public static List<Alert> fetchAllAlerts(Connection conn) throws SQLException {
-        List<Alert> alerts = new ArrayList<>();
-        String query = "SELECT * FROM Alert";
-        
-        try (Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(query)) {
-            while (rs.next()) {
-                Alert alert = new Alert(
-                    rs.getInt("alertID"),
-                    rs.getString("title"),
-                    rs.getString("description"),
-                    rs.getString("startTime"),
-                    rs.getString("endTime"),
-                    rs.getString("severity")
-                );
-                alerts.add(alert);
-            }
-        }
-        return alerts;
-    }
-
     public static ResultSet fetchAllAlertsAsResultSet(Connection conn) throws SQLException {
         String query = "SELECT * FROM Alert";
         Statement st = conn.createStatement();
@@ -206,10 +162,5 @@ public class Alert {
         }
     }
 
-    public static ResultSetMetaData getAlertTableMetadata(Connection conn) throws SQLException {
-        String query = "SELECT * FROM Alert LIMIT 0";
-        try (Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(query)) {
-            return rs.getMetaData();
-        }
-    }
+
 }

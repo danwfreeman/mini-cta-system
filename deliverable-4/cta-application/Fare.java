@@ -1,6 +1,5 @@
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,53 +24,19 @@ public class Fare {
         return fareID;
     }
 
-    public void setFareID(int fareID) {
-        this.fareID = fareID;
-    }
-
     public String getFareCategory() {
         return fareCategory;
-    }
-
-    public void setFareCategory(String fareCategory) {
-        this.fareCategory = fareCategory;
     }
 
     public String getRiderCategory() {
         return riderCategory;
     }
 
-    public void setRiderCategory(String riderCategory) {
-        this.riderCategory = riderCategory;
-    }
-
     public double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
     // Database Operations
-    public static List<Fare> fetchAllFares(Connection conn) throws SQLException {
-        List<Fare> fares = new ArrayList<>();
-        String query = "SELECT * FROM Fare";
-        
-        try (Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(query)) {
-            while (rs.next()) {
-                Fare fare = new Fare(
-                    rs.getInt("fareID"),
-                    rs.getString("fareCategory"),
-                    rs.getString("riderCategory"),
-                    rs.getDouble("price")
-                );
-                fares.add(fare);
-            }
-        }
-        return fares;
-    }
-
     public static ResultSet fetchAllFaresAsResultSet(Connection conn) throws SQLException {
         String query = "SELECT * FROM Fare";
         Statement st = conn.createStatement();
@@ -198,10 +163,4 @@ public class Fare {
         }
     }
 
-    public static ResultSetMetaData getFareTableMetadata(Connection conn) throws SQLException {
-        String query = "SELECT * FROM Fare LIMIT 0";
-        try (Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(query)) {
-            return rs.getMetaData();
-        }
-    }
 }

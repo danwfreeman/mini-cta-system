@@ -17,7 +17,7 @@ CREATE TABLE Line (
   name VARCHAR(100),
   mode ENUM('bus','train'),
   PRIMARY KEY (lineID)
-) ENGINE=InnoDB;
+);
 
 
 -- Station
@@ -27,7 +27,7 @@ CREATE TABLE Station (
   mode ENUM('bus','train'),
   isAccessible BOOLEAN,
   PRIMARY KEY (stationID)
-) ENGINE=InnoDB;
+);
 
 
 -- StationLine (join table)
@@ -44,7 +44,7 @@ CREATE TABLE StationLine (
     FOREIGN KEY (lineID) REFERENCES Line(lineID)
     ON UPDATE CASCADE
     ON DELETE CASCADE
-) ENGINE=InnoDB;
+);
 
 
 -- TimeTable
@@ -64,7 +64,7 @@ CREATE TABLE TimeTable (
     FOREIGN KEY (stationID) REFERENCES Station(stationID)
     ON UPDATE CASCADE
     ON DELETE RESTRICT
-) ENGINE=InnoDB;
+);
 
 
 -- Fare
@@ -74,7 +74,7 @@ CREATE TABLE Fare (
   riderCategory ENUM('regular','reduced','student'),
   price DECIMAL(6,2) NOT NULL,
   PRIMARY KEY (fareID)
-) ENGINE=InnoDB;
+);
 
 
 -- Alert
@@ -86,7 +86,7 @@ CREATE TABLE Alert (
   endTime DATETIME NOT NULL,
   severity ENUM('info','minor','major','critical'),
   PRIMARY KEY (alertID)
-) ENGINE=InnoDB;
+);
 
 
 -- AlertLine (join table)
@@ -102,7 +102,7 @@ CREATE TABLE AlertLine (
     FOREIGN KEY (lineID) REFERENCES Line(lineID)
     ON UPDATE CASCADE
     ON DELETE CASCADE
-) ENGINE=InnoDB;
+);
 
 
 -- AlertStation (join table)
@@ -118,4 +118,4 @@ CREATE TABLE AlertStation (
     FOREIGN KEY (stationID) REFERENCES Station(stationID)
     ON UPDATE CASCADE
     ON DELETE CASCADE
-) ENGINE=InnoDB;
+);
