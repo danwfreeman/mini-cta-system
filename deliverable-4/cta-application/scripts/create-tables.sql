@@ -13,7 +13,7 @@ DROP TABLE IF EXISTS Line;
 
 -- Line
 CREATE TABLE Line (
-  lineID INT NOT NULL,
+  lineID INT NOT NULL AUTO_INCREMENT,
   name VARCHAR(100),
   mode ENUM('bus','train'),
   PRIMARY KEY (lineID)
@@ -22,7 +22,7 @@ CREATE TABLE Line (
 
 -- Station
 CREATE TABLE Station (
-  stationID INT NOT NULL,
+  stationID INT NOT NULL AUTO_INCREMENT,
   name VARCHAR(150),
   mode ENUM('bus','train'),
   isAccessible BOOLEAN,
@@ -69,7 +69,7 @@ CREATE TABLE TimeTable (
 
 -- Fare
 CREATE TABLE Fare (
-  fareID INT NOT NULL,
+  fareID INT NOT NULL AUTO_INCREMENT,
   fareCategory VARCHAR(60),
   riderCategory ENUM('regular','reduced','student'),
   price DECIMAL(6,2) NOT NULL,
@@ -79,7 +79,7 @@ CREATE TABLE Fare (
 
 -- Alert
 CREATE TABLE Alert (
-  alertID INT NOT NULL,
+  alertID INT NOT NULL AUTO_INCREMENT,
   title VARCHAR(150),
   description TEXT NOT NULL,
   startTime DATETIME NOT NULL,
@@ -91,7 +91,7 @@ CREATE TABLE Alert (
 
 -- AlertLine (join table)
 CREATE TABLE AlertLine (
-  alertID INT NOT NULL,
+  alertID INT NOT NULL ,
   lineID INT NOT NULL,
   PRIMARY KEY (alertID, lineID),
   CONSTRAINT fk_alertline_alert
