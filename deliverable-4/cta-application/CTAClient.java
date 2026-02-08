@@ -797,6 +797,7 @@ public class CTAClient extends JFrame {
         SpinnerDateModel startModel = new SpinnerDateModel(startDate, null, null, Calendar.MINUTE);
         JSpinner startSpinner = new JSpinner(startModel);
         startSpinner.setEditor(new JSpinner.DateEditor(startSpinner, "yyyy-MM-dd HH:mm:ss"));
+        ((JSpinner.DateEditor) startSpinner.getEditor()).getTextField().setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
         dialog.add(startSpinner, gbc);
         fieldIndex++;
 
@@ -812,6 +813,7 @@ public class CTAClient extends JFrame {
         SpinnerDateModel endModel = new SpinnerDateModel(endDate, null, null, Calendar.MINUTE);
         JSpinner endSpinner = new JSpinner(endModel);
         endSpinner.setEditor(new JSpinner.DateEditor(endSpinner, "yyyy-MM-dd HH:mm:ss"));
+        ((JSpinner.DateEditor) endSpinner.getEditor()).getTextField().setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
         dialog.add(endSpinner, gbc);
         fieldIndex++;
 

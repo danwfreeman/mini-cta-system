@@ -30,12 +30,19 @@ From the website https://www.transitchicago.com/ this program has created sample
 
 ### Functionality
 
-- load database with data
+- Create a new database named chicago_cta and populates with data, see the cta-schema.png file for the system ERD
 
 - Alerts
     - view all alerts
-    - select 1 alert
-        - update
-        - delete
-    - enter new alert
-        - alert details, line or station
+    - view system only alerts
+    - view alerts only for lines
+    - view alerts only for stations
+    - create, update and delete each of the 4 types of alerts above
+    - enforces proper date time format at the UI layer
+    - enforces that start and end dates are in chronological order (at the database layer)
+
+- Fares
+    - show all fares
+    - add new fare categories
+    - modify any fare entry
+    - ensures the are no duplicate fare and rider catergory entries (at the database layer)
