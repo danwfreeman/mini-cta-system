@@ -7,11 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.*;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 public class CTAClient extends JFrame {
     private Connection conn;
@@ -230,6 +225,20 @@ public class CTAClient extends JFrame {
                 loadLineDropdown();
             } else {
                 centerCardLayout.show(centerCards, "table");
+                switch (selected) {
+                    case "Manage Fares":
+                        onShowFares(null);
+                        break;
+                    case "Manage Alerts":
+                        onShowAlerts(null);
+                        break;
+                    case "Manage Line Alerts":
+                        onShowLineAlerts(null);
+                        break;
+                    case "Manage Station Alerts":
+                        onShowStationAlerts(null);
+                        break;
+                }
             }
         });
 
@@ -310,7 +319,7 @@ public class CTAClient extends JFrame {
 
             Alert alert = Alert.fetchAlertByID(conn, alertId);
             if (alert != null) {
-                showAlertDialog(alert, alertId, false);
+                Alert.showDialog(this, conn, alert, alertId, false, () -> onShowAlerts(null));
             }
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error loading alert: " + ex.getMessage(), "Error",
@@ -320,7 +329,7 @@ public class CTAClient extends JFrame {
 
     private void onCreateAlert(ActionEvent e) {
         try {
-            showAlertDialog(new Alert(), -1, true);
+            Alert.showDialog(this, conn, new Alert(), -1, true, () -> onShowAlerts(null));
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error opening create dialog: " + ex.getMessage(), "Error",
                     JOptionPane.ERROR_MESSAGE);
@@ -377,7 +386,7 @@ public class CTAClient extends JFrame {
 
             Fare fare = Fare.fetchFareByID(conn, fareId);
             if (fare != null) {
-                showFareDialog(fare, fareId, false);
+                Fare.showDialog(this, conn, fare, fareId, false, () -> onShowFares(null));
             }
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error loading fare: " + ex.getMessage(), "Error",
@@ -387,7 +396,7 @@ public class CTAClient extends JFrame {
 
     private void onCreateFare(ActionEvent e) {
         try {
-            showFareDialog(new Fare(), -1, true);
+            Fare.showDialog(this, conn, new Fare(), -1, true, () -> onShowFares(null));
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error opening create dialog: " + ex.getMessage(), "Error",
                     JOptionPane.ERROR_MESSAGE);
@@ -446,7 +455,7 @@ public class CTAClient extends JFrame {
             int alertId = Integer.parseInt(model.getValueAt(selectedRow, 0).toString());
             int lineId = Integer.parseInt(model.getValueAt(selectedRow, 2).toString());
 
-            showLineAlertDialog(alertId, lineId, false);
+            AlertLine.showDialog(this, conn, alertId, lineId, false, () -> onShowLineAlerts(null));
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error loading line alert: " + ex.getMessage(), "Error",
                     JOptionPane.ERROR_MESSAGE);
@@ -455,100 +464,11 @@ public class CTAClient extends JFrame {
 
     private void onCreateLineAlert(ActionEvent e) {
         try {
-            showLineAlertDialog(-1, -1, true);
+            AlertLine.showDialog(this, conn, -1, -1, true, () -> onShowLineAlerts(null));
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error opening create dialog: " + ex.getMessage(), "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
-    }
-
-    private void showLineAlertDialog(int currentAlertID, int currentLineID, boolean isCreate) throws SQLException {
-        JDialog dialog = new JDialog(this, isCreate ? "Create Line Alert" : "Update Line Alert", true);
-        dialog.setSize(450, 200);
-        dialog.setLocationRelativeTo(this);
-        dialog.setLayout(new GridBagLayout());
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.anchor = GridBagConstraints.WEST;
-
-        // Alert dropdown
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        dialog.add(new JLabel("Alert:"), gbc);
-
-        JComboBox<String> alertCombo = new JComboBox<>();
-        java.util.List<int[]> alertIds = new java.util.ArrayList<>();
-        ResultSet alertRs = AlertLine.fetchAllAlerts(conn);
-        int selectedAlertIndex = -1;
-        int idx = 0;
-        while (alertRs.next()) {
-            int id = alertRs.getInt("alertID");
-            String title = alertRs.getString("title");
-            alertCombo.addItem(title);
-            alertIds.add(new int[]{id});
-            if (id == currentAlertID) selectedAlertIndex = idx;
-            idx++;
-        }
-        if (selectedAlertIndex >= 0) alertCombo.setSelectedIndex(selectedAlertIndex);
-
-        gbc.gridx = 1;
-        dialog.add(alertCombo, gbc);
-
-        // Line dropdown
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        dialog.add(new JLabel("Line:"), gbc);
-
-        JComboBox<String> lineCombo = new JComboBox<>();
-        java.util.List<int[]> lineIds = new java.util.ArrayList<>();
-        ResultSet lineRs = AlertLine.fetchAllLines(conn);
-        int selectedLineIndex = -1;
-        idx = 0;
-        while (lineRs.next()) {
-            int id = lineRs.getInt("lineID");
-            String name = lineRs.getString("name");
-            lineCombo.addItem(name);
-            lineIds.add(new int[]{id});
-            if (id == currentLineID) selectedLineIndex = idx;
-            idx++;
-        }
-        if (selectedLineIndex >= 0) lineCombo.setSelectedIndex(selectedLineIndex);
-
-        gbc.gridx = 1;
-        dialog.add(lineCombo, gbc);
-
-        // Save button
-        JButton saveBtn = new JButton("Save");
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.gridwidth = 2;
-        dialog.add(saveBtn, gbc);
-
-        final int origAlertID = currentAlertID;
-        final int origLineID = currentLineID;
-        final java.util.List<int[]> finalAlertIds = alertIds;
-        final java.util.List<int[]> finalLineIds = lineIds;
-
-        saveBtn.addActionListener(ev -> {
-            try {
-                int newAlertID = finalAlertIds.get(alertCombo.getSelectedIndex())[0];
-                int newLineID = finalLineIds.get(lineCombo.getSelectedIndex())[0];
-
-                if (isCreate) {
-                    AlertLine.createAlertLine(conn, newAlertID, newLineID);
-                } else {
-                    AlertLine.updateAlertLine(conn, origAlertID, origLineID, newAlertID, newLineID);
-                }
-                dialog.dispose();
-                onShowLineAlerts(null);
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(dialog, "Error saving line alert: " + ex.getMessage(), "Error",
-                        JOptionPane.ERROR_MESSAGE);
-            }
-        });
-
-        dialog.setVisible(true);
     }
 
     // Station Alert handlers
@@ -603,7 +523,7 @@ public class CTAClient extends JFrame {
             int alertId = Integer.parseInt(model.getValueAt(selectedRow, 0).toString());
             int stationId = Integer.parseInt(model.getValueAt(selectedRow, 2).toString());
 
-            showStationAlertDialog(alertId, stationId, false);
+            AlertStation.showDialog(this, conn, alertId, stationId, false, () -> onShowStationAlerts(null));
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error loading station alert: " + ex.getMessage(), "Error",
                     JOptionPane.ERROR_MESSAGE);
@@ -612,100 +532,11 @@ public class CTAClient extends JFrame {
 
     private void onCreateStationAlert(ActionEvent e) {
         try {
-            showStationAlertDialog(-1, -1, true);
+            AlertStation.showDialog(this, conn, -1, -1, true, () -> onShowStationAlerts(null));
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error opening create dialog: " + ex.getMessage(), "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
-    }
-
-    private void showStationAlertDialog(int currentAlertID, int currentStationID, boolean isCreate) throws SQLException {
-        JDialog dialog = new JDialog(this, isCreate ? "Create Station Alert" : "Update Station Alert", true);
-        dialog.setSize(450, 200);
-        dialog.setLocationRelativeTo(this);
-        dialog.setLayout(new GridBagLayout());
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.anchor = GridBagConstraints.WEST;
-
-        // Alert dropdown
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        dialog.add(new JLabel("Alert:"), gbc);
-
-        JComboBox<String> alertCombo = new JComboBox<>();
-        java.util.List<int[]> alertIds = new java.util.ArrayList<>();
-        ResultSet alertRs = AlertStation.fetchAllAlerts(conn);
-        int selectedAlertIndex = -1;
-        int idx = 0;
-        while (alertRs.next()) {
-            int id = alertRs.getInt("alertID");
-            String title = alertRs.getString("title");
-            alertCombo.addItem(title);
-            alertIds.add(new int[]{id});
-            if (id == currentAlertID) selectedAlertIndex = idx;
-            idx++;
-        }
-        if (selectedAlertIndex >= 0) alertCombo.setSelectedIndex(selectedAlertIndex);
-
-        gbc.gridx = 1;
-        dialog.add(alertCombo, gbc);
-
-        // Station dropdown
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        dialog.add(new JLabel("Station:"), gbc);
-
-        JComboBox<String> stationCombo = new JComboBox<>();
-        java.util.List<int[]> stationIds = new java.util.ArrayList<>();
-        ResultSet stationRs = AlertStation.fetchAllStations(conn);
-        int selectedStationIndex = -1;
-        idx = 0;
-        while (stationRs.next()) {
-            int id = stationRs.getInt("stationID");
-            String name = stationRs.getString("name");
-            stationCombo.addItem(name);
-            stationIds.add(new int[]{id});
-            if (id == currentStationID) selectedStationIndex = idx;
-            idx++;
-        }
-        if (selectedStationIndex >= 0) stationCombo.setSelectedIndex(selectedStationIndex);
-
-        gbc.gridx = 1;
-        dialog.add(stationCombo, gbc);
-
-        // Save button
-        JButton saveBtn = new JButton("Save");
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.gridwidth = 2;
-        dialog.add(saveBtn, gbc);
-
-        final int origAlertID = currentAlertID;
-        final int origStationID = currentStationID;
-        final java.util.List<int[]> finalAlertIds = alertIds;
-        final java.util.List<int[]> finalStationIds = stationIds;
-
-        saveBtn.addActionListener(ev -> {
-            try {
-                int newAlertID = finalAlertIds.get(alertCombo.getSelectedIndex())[0];
-                int newStationID = finalStationIds.get(stationCombo.getSelectedIndex())[0];
-
-                if (isCreate) {
-                    AlertStation.createAlertStation(conn, newAlertID, newStationID);
-                } else {
-                    AlertStation.updateAlertStation(conn, origAlertID, origStationID, newAlertID, newStationID);
-                }
-                dialog.dispose();
-                onShowStationAlerts(null);
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(dialog, "Error saving station alert: " + ex.getMessage(), "Error",
-                        JOptionPane.ERROR_MESSAGE);
-            }
-        });
-
-        dialog.setVisible(true);
     }
 
     private void loadLineDropdown() {
@@ -809,197 +640,6 @@ public class CTAClient extends JFrame {
                 resultTable.getColumnModel().removeColumn(resultTable.getColumnModel().getColumn(i));
             }
         }
-    }
-
-    private void showAlertDialog(Alert alert, int alertId, boolean isCreate) throws SQLException {
-        JDialog dialog = new JDialog(this, isCreate ? "Create Alert" : "Update Alert", true);
-        dialog.setSize(500, 350);
-        dialog.setLocationRelativeTo(this);
-        dialog.setLayout(new GridBagLayout());
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.anchor = GridBagConstraints.WEST;
-
-        Map<String, JTextField> fieldMap = new HashMap<>();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        int fieldIndex = 0;
-
-        // Title
-        gbc.gridx = 0;
-        gbc.gridy = fieldIndex;
-        dialog.add(new JLabel("Title:"), gbc);
-        gbc.gridx = 1;
-        JTextField titleField = new JTextField(!isCreate && alert.getTitle() != null ? alert.getTitle() : "", 20);
-        fieldMap.put("Title", titleField);
-        dialog.add(titleField, gbc);
-        fieldIndex++;
-
-        // Description
-        gbc.gridx = 0;
-        gbc.gridy = fieldIndex;
-        dialog.add(new JLabel("Description:"), gbc);
-        gbc.gridx = 1;
-        JTextField descField = new JTextField(!isCreate && alert.getDescription() != null ? alert.getDescription() : "", 20);
-        fieldMap.put("Description", descField);
-        dialog.add(descField, gbc);
-        fieldIndex++;
-
-        // Start Time spinner
-        gbc.gridx = 0;
-        gbc.gridy = fieldIndex;
-        dialog.add(new JLabel("Start Time:"), gbc);
-        gbc.gridx = 1;
-        Date startDate = new Date();
-        if (!isCreate && alert.getStartTime() != null) {
-            try { startDate = sdf.parse(alert.getStartTime()); } catch (Exception ignored) {}
-        }
-        SpinnerDateModel startModel = new SpinnerDateModel(startDate, null, null, Calendar.MINUTE);
-        JSpinner startSpinner = new JSpinner(startModel);
-        startSpinner.setEditor(new JSpinner.DateEditor(startSpinner, "yyyy-MM-dd HH:mm:ss"));
-        ((JSpinner.DateEditor) startSpinner.getEditor()).getTextField().setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
-        dialog.add(startSpinner, gbc);
-        fieldIndex++;
-
-        // End Time spinner
-        gbc.gridx = 0;
-        gbc.gridy = fieldIndex;
-        dialog.add(new JLabel("End Time:"), gbc);
-        gbc.gridx = 1;
-        Date endDate = new Date();
-        if (!isCreate && alert.getEndTime() != null) {
-            try { endDate = sdf.parse(alert.getEndTime()); } catch (Exception ignored) {}
-        }
-        SpinnerDateModel endModel = new SpinnerDateModel(endDate, null, null, Calendar.MINUTE);
-        JSpinner endSpinner = new JSpinner(endModel);
-        endSpinner.setEditor(new JSpinner.DateEditor(endSpinner, "yyyy-MM-dd HH:mm:ss"));
-        ((JSpinner.DateEditor) endSpinner.getEditor()).getTextField().setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
-        dialog.add(endSpinner, gbc);
-        fieldIndex++;
-
-        // Severity
-        gbc.gridx = 0;
-        gbc.gridy = fieldIndex;
-        dialog.add(new JLabel("Severity:"), gbc);
-        gbc.gridx = 1;
-        JComboBox<String> severityCombo = new JComboBox<>(new String[]{"info", "minor", "major", "critical"});
-        if (!isCreate && alert.getSeverity() != null) {
-            severityCombo.setSelectedItem(alert.getSeverity());
-        }
-        dialog.add(severityCombo, gbc);
-        fieldIndex++;
-
-        JButton saveBtn = new JButton("Save");
-        gbc.gridx = 0;
-        gbc.gridy = fieldIndex;
-        gbc.gridwidth = 2;
-        dialog.add(saveBtn, gbc);
-
-        saveBtn.addActionListener(e -> {
-            try {
-                Map<String, String> fieldValues = new HashMap<>();
-                for (String columnName : fieldMap.keySet()) {
-                    fieldValues.put(columnName, fieldMap.get(columnName).getText());
-                }
-                fieldValues.put("startTime", sdf.format(startSpinner.getValue()));
-                fieldValues.put("endTime", sdf.format(endSpinner.getValue()));
-                fieldValues.put("severity", (String) severityCombo.getSelectedItem());
-
-                if (isCreate) {
-                    Alert.createAlert(conn, fieldValues);
-                } else {
-                    Alert.updateAlert(conn, alertId, fieldValues);
-                }
-                dialog.dispose();
-                onShowAlerts(null);
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(dialog, "Error saving alert: " + ex.getMessage(), "Error",
-                        JOptionPane.ERROR_MESSAGE);
-            }
-        });
-
-        dialog.setVisible(true);
-    }
-
-    private void showFareDialog(Fare fare, int fareId, boolean isCreate) throws SQLException {
-        JDialog dialog = new JDialog(this, isCreate ? "Create Fare" : "Update Fare", true);
-        dialog.setSize(400, 300);
-        dialog.setLocationRelativeTo(this);
-        dialog.setLayout(new GridBagLayout());
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.anchor = GridBagConstraints.WEST;
-
-        Map<String, JTextField> fieldMap = new HashMap<>();
-        int fieldIndex = 0;
-
-        // Fare Category
-        gbc.gridx = 0;
-        gbc.gridy = fieldIndex;
-        dialog.add(new JLabel("Fare Category:"), gbc);
-        gbc.gridx = 1;
-        JTextField fareCategoryField = new JTextField(!isCreate && fare.getFareCategory() != null ? fare.getFareCategory() : "", 20);
-        fieldMap.put("fareCategory", fareCategoryField);
-        dialog.add(fareCategoryField, gbc);
-        fieldIndex++;
-
-        // Rider Category dropdown
-        gbc.gridx = 0;
-        gbc.gridy = fieldIndex;
-        dialog.add(new JLabel("Rider Category:"), gbc);
-        gbc.gridx = 1;
-        JComboBox<String> riderCategoryCombo = new JComboBox<>(new String[]{"regular", "reduced", "student"});
-        if (!isCreate && fare.getRiderCategory() != null) {
-            riderCategoryCombo.setSelectedItem(fare.getRiderCategory());
-        }
-        dialog.add(riderCategoryCombo, gbc);
-        fieldIndex++;
-
-        // Price
-        gbc.gridx = 0;
-        gbc.gridy = fieldIndex;
-        dialog.add(new JLabel("Price:"), gbc);
-        gbc.gridx = 1;
-        JTextField priceField = new JTextField(!isCreate ? String.valueOf(fare.getPrice()) : "", 20);
-        fieldMap.put("price", priceField);
-        dialog.add(priceField, gbc);
-        fieldIndex++;
-
-        JButton saveBtn = new JButton("Save");
-        gbc.gridx = 0;
-        gbc.gridy = fieldIndex;
-        gbc.gridwidth = 2;
-        dialog.add(saveBtn, gbc);
-
-        saveBtn.addActionListener(e -> {
-            try {
-                Map<String, String> fieldValues = new HashMap<>();
-                for (String columnName : fieldMap.keySet()) {
-                    fieldValues.put(columnName, fieldMap.get(columnName).getText());
-                }
-                fieldValues.put("riderCategory", (String) riderCategoryCombo.getSelectedItem());
-
-                if (isCreate) {
-                    Fare.createFare(conn, fieldValues);
-                } else {
-                    Fare.updateFare(conn, fareId, fieldValues);
-                }
-                dialog.dispose();
-                onShowFares(null);
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(dialog, "Database error: " + ex.getMessage(), "Error",
-                        JOptionPane.ERROR_MESSAGE);
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(dialog, "Invalid number format: " + ex.getMessage(), "Validation Error",
-                        JOptionPane.WARNING_MESSAGE);
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(dialog, "Unexpected error: " + ex.getMessage(), "Error",
-                        JOptionPane.ERROR_MESSAGE);
-            }
-        });
-
-        dialog.setVisible(true);
     }
 
     private boolean connect(String host, int port, String user, String password, String database) {

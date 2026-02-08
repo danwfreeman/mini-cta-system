@@ -21,16 +21,28 @@ public class LineDetail {
 
         panel.add(Box.createVerticalStrut(20));
 
-        // Line title
-        JLabel titleLabel = new JLabel(lineName);
-        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 22));
-        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        panel.add(titleLabel);
-        panel.add(Box.createVerticalStrut(15));
-
+        String lineMode = null;
         int stopNum = 0;
         while (rs.next()) {
             stopNum++;
+
+            // Grab mode from first row
+            if (lineMode == null) {
+                lineMode = rs.getString("lineMode");
+                String modeIcon = "train".equalsIgnoreCase(lineMode) ? "\ud83d\ude82" : "\ud83d\ude8c";
+                JLabel titleLabel = new JLabel(lineName + "  " + modeIcon);
+                titleLabel.setFont(new Font("SansSerif", Font.BOLD, 22));
+                titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+                panel.add(titleLabel);
+
+                JLabel modeLabel = new JLabel(lineMode.substring(0, 1).toUpperCase() + lineMode.substring(1));
+                modeLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
+                modeLabel.setForeground(Color.GRAY);
+                modeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+                panel.add(modeLabel);
+                panel.add(Box.createVerticalStrut(15));
+            }
+
             String stationName = rs.getString("stationName");
             boolean accessible = rs.getBoolean("isAccessible");
 
@@ -61,6 +73,12 @@ public class LineDetail {
         }
 
         if (stopNum == 0) {
+            JLabel titleLabel = new JLabel(lineName);
+            titleLabel.setFont(new Font("SansSerif", Font.BOLD, 22));
+            titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            panel.add(titleLabel);
+            panel.add(Box.createVerticalStrut(15));
+
             JLabel emptyLabel = new JLabel("No stops found for this line.");
             emptyLabel.setFont(new Font("SansSerif", Font.ITALIC, 14));
             emptyLabel.setAlignmentX(Component.CENTER_ALIGNMENT);

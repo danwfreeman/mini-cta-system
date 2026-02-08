@@ -87,7 +87,6 @@ INSERT INTO StationLine (stationID, lineID, stopSequence) VALUES
 
 
 -- Bus 151 Sheridan
-(1014, 15, 1),  -- Michigan/Chicago
 (1015, 15, 2),  -- Navy Pier Terminal
 (1016, 15, 3),  -- Huron
 (1017, 15, 4);  -- Shore Drive
