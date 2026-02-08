@@ -4,35 +4,25 @@ As an operator I want to see the average number of stations per line (train or b
 
 I could save these over time and graph them to get an idea of how the system is progressing in adding stations to bus or train lines (more likely bus lines)
 
-WITH stations_per_line AS (
-            SELECT
-              l.lineID,
-              l.name AS lineName,
-              l.mode,           -- 'train' or 'bus'
-              COUNT(DISTINCT ls.stationID) AS stationCount
-            FROM Line l
-            JOIN StationLine ls ON ls.lineID = l.lineID
-            GROUP BY l.lineID, l.name, l.mode
-          )
-          SELECT
-            mode,
-            lineName,
-            AVG(stationCount) AS avgStationsPerLine
-          FROM stations_per_line
-          GROUP BY mode, lineName;
-+-------+--------------+--------------------+
-| mode  | lineName     | avgStationsPerLine |
-+-------+--------------+--------------------+
-| train | Red Line     |             5.0000 |
-| train | Blue Line    |             3.0000 |
-| train | Brown Line   |             3.0000 |
-| train | Green Line   |             3.0000 |
-| train | Orange Line  |             3.0000 |
-| train | Purple Line  |             3.0000 |
-| train | Pink Line    |             3.0000 |
-| train | Yellow Line  |             3.0000 |
-| bus   | 8 Halsted    |             3.0000 |
-| bus   | 9 Ashland    |             3.0000 |
-| bus   | 66 Chicago   |             4.0000 |
-| bus   | 151 Sheridan |             1.0000 |
-+-------+--------------+--------
+mysql> WITH stations_per_line AS (
+                 SELECT
+                   l.lineID,
+                   l.name AS lineName,
+                   l.mode,           -- 'train' or 'bus'
+                   COUNT(DISTINCT sl.stationID) AS stationCount
+                 FROM Line l
+                 JOIN StationLine sl ON sl.lineID = l.lineID
+                 GROUP BY l.lineID, l.name, l.mode
+               )
+               SELECT
+                 mode,
+                 AVG(stationCount) AS avgStationsPerLine
+               FROM stations_per_line
+               GROUP BY mode;
++-------+--------------------+
+| mode  | avgStationsPerLine |
++-------+--------------------+
+| train |             3.2500 |
+| bus   |             2.7500 |
++-------+--------------------+
+2 rows in set (0.002 sec)

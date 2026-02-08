@@ -8,15 +8,15 @@ From the website https://www.transitchicago.com/ this program has created sample
 - viewing all stops on a particular line
 
 ### Setup 
-- install [MySQL Wrokbench](https://www.mysql.com/products/workbench/)
+- install [MySQL Workbench](https://www.mysql.com/products/workbench/)
 - install the open jdk version 25 for your OS
     - mac or linux:
     - `brew install openjdk`
 
 ### Start Application
 
-- unzip cta.zip to a directory a directory, eg './cta'
-- from within root for './cta'- run database setup scripts:
+- unzip cta.zip to a directory, eg './cta'
+- from within the root of './cta', run database setup scripts:
     - run `./setup-database.sh` (prompts for login, password is 'blank')
     - will prompt for the password 9 times, hit enter for each
     - database will be created and populated with data
@@ -24,8 +24,8 @@ From the website https://www.transitchicago.com/ this program has created sample
 
 - compile the java files into platform independent byte code
     - `javac CTAClient.java`
-- run the GUI application (note classpath entry to mysql jdbc driver)
-    - `java -cp .:lib/mysql-connector-java.jar CTAClient`
+- run the GUI application (note classpath entry for the mysql jdbc driver)
+    - `java -cp ".:lib/*" CTAClient `
 
 
 
@@ -47,7 +47,7 @@ From the website https://www.transitchicago.com/ this program has created sample
     - add new fare entry (can add a new fare category as well)
     - modify any fare entry
     - delete any fare entry
-    - ensures the are no duplicate fare and rider catergory entries (at the database layer)
+    - ensures the are no duplicate fare and rider category entries (at the database layer)
 
 - Line Detail
     - for each line shows a graphical view of the stops in order and if they are accessible (for train and bus lines)
