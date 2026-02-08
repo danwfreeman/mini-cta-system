@@ -22,10 +22,10 @@ From the website https://www.transitchicago.com/ this program has created sample
     - database will be created and populated with data
 
 
-- compile the java files into platform independent byte code
+- (optional, files already compiled in zip) compile the java files into platform independent byte code
     - `javac CTAClient.java`
 - run the GUI application (note classpath entry for the mysql jdbc driver)
-    - `java -cp ".:lib/*" CTAClient `
+    - `java -cp ".:lib/*" CTAClient`
 
 
 

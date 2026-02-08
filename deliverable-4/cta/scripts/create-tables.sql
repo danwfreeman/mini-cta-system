@@ -75,7 +75,8 @@ CREATE TABLE Fare (
   fareCategory VARCHAR(60),
   riderCategory ENUM('regular','reduced','student'),
   price DECIMAL(6,2) NOT NULL,
-  PRIMARY KEY (fareID)
+  PRIMARY KEY (fareID),
+  UNIQUE KEY uq_fare_category_rider (fareCategory, riderCategory)
 );
 
 
