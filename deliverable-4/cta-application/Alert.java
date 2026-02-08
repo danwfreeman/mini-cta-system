@@ -100,6 +100,14 @@ public class Alert {
         return st.executeQuery(query);
     }
 
+    public static ResultSet fetchSystemWideAlertsAsResultSet(Connection conn) throws SQLException {
+        String query = "SELECT * FROM Alert a " +
+                        "WHERE NOT EXISTS (SELECT 1 FROM AlertLine al WHERE al.alertID = a.alertID) " +
+                        "AND NOT EXISTS (SELECT 1 FROM AlertStation ast WHERE ast.alertID = a.alertID)";
+        Statement st = conn.createStatement();
+        return st.executeQuery(query);
+    }
+
     public static Alert fetchAlertByID(Connection conn, int alertID) throws SQLException {
         String query = "SELECT * FROM Alert WHERE alertID = ?";
         

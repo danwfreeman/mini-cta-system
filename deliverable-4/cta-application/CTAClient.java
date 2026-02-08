@@ -17,8 +17,12 @@ public class CTAClient extends JFrame {
     private JButton updateAlertBtn;
     private JButton deleteFareBtn;
     private JButton updateFareBtn;
+    private JButton deleteLineAlertBtn;
+    private JButton updateLineAlertBtn;
+    private JButton deleteStationAlertBtn;
+    private JButton updateStationAlertBtn;
     private int selectedRow = -1;
-    private String currentTableType = null; // "alerts" or "fares"
+    private String currentTableType = null; // "alerts", "fares", "linealerts", or "stationalerts"
 
     public CTAClient() {
         super("CTA MySQL Client");
@@ -37,6 +41,10 @@ public class CTAClient extends JFrame {
             updateAlertBtn.setEnabled(selectedRow >= 0);
             deleteFareBtn.setEnabled(selectedRow >= 0);
             updateFareBtn.setEnabled(selectedRow >= 0);
+            deleteLineAlertBtn.setEnabled(selectedRow >= 0);
+            updateLineAlertBtn.setEnabled(selectedRow >= 0);
+            deleteStationAlertBtn.setEnabled(selectedRow >= 0);
+            updateStationAlertBtn.setEnabled(selectedRow >= 0);
         });
         resultTable.addMouseListener(new MouseAdapter() {
             @Override
@@ -48,6 +56,10 @@ public class CTAClient extends JFrame {
                             onUpdateAlert(null);
                         } else if ("fares".equals(currentTableType)) {
                             onUpdateFare(null);
+                        } else if ("linealerts".equals(currentTableType)) {
+                            onUpdateLineAlert(null);
+                        } else if ("stationalerts".equals(currentTableType)) {
+                            onUpdateStationAlert(null);
                         }
                     }
                 }
@@ -71,11 +83,60 @@ public class CTAClient extends JFrame {
         JButton createAlertBtn = new JButton("Create Alert");
         createAlertBtn.addActionListener(this::onCreateAlert);
 
+        JButton showSystemWideAlertsBtn = new JButton("Show System Wide Alerts");
+        showSystemWideAlertsBtn.setEnabled(true);
+        showSystemWideAlertsBtn.addActionListener(this::onShowSystemWideAlerts);
+
         JPanel alertButtonPanel = new JPanel();
         alertButtonPanel.add(showAlertsBtn);
+        alertButtonPanel.add(showSystemWideAlertsBtn);
         alertButtonPanel.add(createAlertBtn);
         alertButtonPanel.add(deleteAlertBtn);
         alertButtonPanel.add(updateAlertBtn);
+
+        // Line Alerts section
+        JButton showLineAlertsBtn = new JButton("Show Line Alerts");
+        showLineAlertsBtn.setEnabled(true);
+        showLineAlertsBtn.addActionListener(this::onShowLineAlerts);
+
+        deleteLineAlertBtn = new JButton("Delete Line Alert");
+        deleteLineAlertBtn.setEnabled(false);
+        deleteLineAlertBtn.addActionListener(this::onDeleteLineAlert);
+
+        updateLineAlertBtn = new JButton("Update Line Alert");
+        updateLineAlertBtn.setEnabled(false);
+        updateLineAlertBtn.addActionListener(this::onUpdateLineAlert);
+
+        JButton createLineAlertBtn = new JButton("Create Line Alert");
+        createLineAlertBtn.addActionListener(this::onCreateLineAlert);
+
+        JPanel lineAlertButtonPanel = new JPanel();
+        lineAlertButtonPanel.add(showLineAlertsBtn);
+        lineAlertButtonPanel.add(createLineAlertBtn);
+        lineAlertButtonPanel.add(deleteLineAlertBtn);
+        lineAlertButtonPanel.add(updateLineAlertBtn);
+
+        // Station Alerts section
+        JButton showStationAlertsBtn = new JButton("Show Station Alerts");
+        showStationAlertsBtn.setEnabled(true);
+        showStationAlertsBtn.addActionListener(this::onShowStationAlerts);
+
+        deleteStationAlertBtn = new JButton("Delete Station Alert");
+        deleteStationAlertBtn.setEnabled(false);
+        deleteStationAlertBtn.addActionListener(this::onDeleteStationAlert);
+
+        updateStationAlertBtn = new JButton("Update Station Alert");
+        updateStationAlertBtn.setEnabled(false);
+        updateStationAlertBtn.addActionListener(this::onUpdateStationAlert);
+
+        JButton createStationAlertBtn = new JButton("Create Station Alert");
+        createStationAlertBtn.addActionListener(this::onCreateStationAlert);
+
+        JPanel stationAlertButtonPanel = new JPanel();
+        stationAlertButtonPanel.add(showStationAlertsBtn);
+        stationAlertButtonPanel.add(createStationAlertBtn);
+        stationAlertButtonPanel.add(deleteStationAlertBtn);
+        stationAlertButtonPanel.add(updateStationAlertBtn);
 
         // Fares section
         JButton showFaresBtn = new JButton("Show Fares");
@@ -106,17 +167,39 @@ public class CTAClient extends JFrame {
         headerPanel.add(welcomeLabel, BorderLayout.NORTH);
 
         JPanel faresRow = new JPanel();
-        faresRow.add(new JLabel("Fares:"));
         faresRow.add(fareButtonPanel);
 
         JPanel alertsRow = new JPanel();
-        alertsRow.add(new JLabel("Alerts:"));
         alertsRow.add(alertButtonPanel);
+
+        JPanel lineAlertsRow = new JPanel();
+        lineAlertsRow.add(lineAlertButtonPanel);
+
+        JPanel stationAlertsRow = new JPanel();
+        stationAlertsRow.add(stationAlertButtonPanel);
+
+        // CardLayout to swap button rows
+        CardLayout cardLayout = new CardLayout();
+        JPanel buttonCards = new JPanel(cardLayout);
+        buttonCards.add(faresRow, "Manage Fares");
+        buttonCards.add(alertsRow, "Manage Alerts");
+        buttonCards.add(lineAlertsRow, "Manage Line Alerts");
+        buttonCards.add(stationAlertsRow, "Manage Station Alerts");
+
+        JComboBox<String> manageDropdown = new JComboBox<>(new String[]{
+            "Manage Fares", "Manage Alerts", "Manage Line Alerts", "Manage Station Alerts"
+        });
+        manageDropdown.addActionListener(e -> {
+            cardLayout.show(buttonCards, (String) manageDropdown.getSelectedItem());
+        });
+
+        JPanel dropdownRow = new JPanel();
+        dropdownRow.add(manageDropdown);
 
         JPanel topButtonsPanel = new JPanel();
         topButtonsPanel.setLayout(new BoxLayout(topButtonsPanel, BoxLayout.Y_AXIS));
-        topButtonsPanel.add(faresRow);
-        topButtonsPanel.add(alertsRow);
+        topButtonsPanel.add(dropdownRow);
+        topButtonsPanel.add(buttonCards);
 
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(headerPanel, BorderLayout.NORTH);
@@ -137,6 +220,17 @@ public class CTAClient extends JFrame {
         }
     }
 
+    private void onShowSystemWideAlerts(ActionEvent e) {
+        try {
+            currentTableType = "alerts";
+            ResultSet rs = Alert.fetchSystemWideAlertsAsResultSet(conn);
+            populateTable(rs);
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error loading system wide alerts: " + ex.getMessage(), "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
     private void onDeleteAlert(ActionEvent e) {
         if (selectedRow < 0) {
             JOptionPane.showMessageDialog(this, "Please select an alert to delete");
@@ -150,7 +244,7 @@ public class CTAClient extends JFrame {
 
         try {
             DefaultTableModel model = (DefaultTableModel) resultTable.getModel();
-            int alertId = (int) model.getValueAt(selectedRow, 0);
+            int alertId = Integer.parseInt(model.getValueAt(selectedRow, 0).toString());
 
             Alert.deleteAlert(conn, alertId);
             JOptionPane.showMessageDialog(this, "Alert deleted successfully");
@@ -172,7 +266,7 @@ public class CTAClient extends JFrame {
 
         try {
             DefaultTableModel model = (DefaultTableModel) resultTable.getModel();
-            int alertId = (int) model.getValueAt(selectedRow, 0);
+            int alertId = Integer.parseInt(model.getValueAt(selectedRow, 0).toString());
 
             Alert alert = Alert.fetchAlertByID(conn, alertId);
             if (alert != null) {
@@ -217,7 +311,7 @@ public class CTAClient extends JFrame {
 
         try {
             DefaultTableModel model = (DefaultTableModel) resultTable.getModel();
-            int fareId = (int) model.getValueAt(selectedRow, 0);
+            int fareId = Integer.parseInt(model.getValueAt(selectedRow, 0).toString());
 
             Fare.deleteFare(conn, fareId);
             JOptionPane.showMessageDialog(this, "Fare deleted successfully");
@@ -239,7 +333,7 @@ public class CTAClient extends JFrame {
 
         try {
             DefaultTableModel model = (DefaultTableModel) resultTable.getModel();
-            int fareId = (int) model.getValueAt(selectedRow, 0);
+            int fareId = Integer.parseInt(model.getValueAt(selectedRow, 0).toString());
 
             Fare fare = Fare.fetchFareByID(conn, fareId);
             if (fare != null) {
@@ -260,6 +354,320 @@ public class CTAClient extends JFrame {
         }
     }
 
+    // Line Alert handlers
+
+    private void onShowLineAlerts(ActionEvent e) {
+        try {
+            currentTableType = "linealerts";
+            ResultSet rs = AlertLine.fetchAllAlertLinesAsResultSet(conn);
+            populateTable(rs);
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error loading line alerts: " + ex.getMessage(), "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void onDeleteLineAlert(ActionEvent e) {
+        if (selectedRow < 0) {
+            JOptionPane.showMessageDialog(this, "Please select a line alert to delete");
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this line alert?",
+                "Confirm Delete", JOptionPane.YES_NO_OPTION);
+        if (confirm != JOptionPane.YES_OPTION)
+            return;
+
+        try {
+            DefaultTableModel model = (DefaultTableModel) resultTable.getModel();
+            int alertId = Integer.parseInt(model.getValueAt(selectedRow, 0).toString());
+            int lineId = Integer.parseInt(model.getValueAt(selectedRow, 2).toString());
+
+            AlertLine.deleteAlertLine(conn, alertId, lineId);
+            JOptionPane.showMessageDialog(this, "Line alert deleted successfully");
+            onShowLineAlerts(null);
+            selectedRow = -1;
+            deleteLineAlertBtn.setEnabled(false);
+            updateLineAlertBtn.setEnabled(false);
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error deleting line alert: " + ex.getMessage(), "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void onUpdateLineAlert(ActionEvent e) {
+        if (selectedRow < 0) {
+            JOptionPane.showMessageDialog(this, "Please select a line alert to update");
+            return;
+        }
+
+        try {
+            DefaultTableModel model = (DefaultTableModel) resultTable.getModel();
+            int alertId = Integer.parseInt(model.getValueAt(selectedRow, 0).toString());
+            int lineId = Integer.parseInt(model.getValueAt(selectedRow, 2).toString());
+
+            showLineAlertDialog(alertId, lineId, false);
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error loading line alert: " + ex.getMessage(), "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void onCreateLineAlert(ActionEvent e) {
+        try {
+            showLineAlertDialog(-1, -1, true);
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error opening create dialog: " + ex.getMessage(), "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void showLineAlertDialog(int currentAlertID, int currentLineID, boolean isCreate) throws SQLException {
+        JDialog dialog = new JDialog(this, isCreate ? "Create Line Alert" : "Update Line Alert", true);
+        dialog.setSize(450, 200);
+        dialog.setLocationRelativeTo(this);
+        dialog.setLayout(new GridBagLayout());
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.WEST;
+
+        // Alert dropdown
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        dialog.add(new JLabel("Alert:"), gbc);
+
+        JComboBox<String> alertCombo = new JComboBox<>();
+        java.util.List<int[]> alertIds = new java.util.ArrayList<>();
+        ResultSet alertRs = AlertLine.fetchAllAlerts(conn);
+        int selectedAlertIndex = -1;
+        int idx = 0;
+        while (alertRs.next()) {
+            int id = alertRs.getInt("alertID");
+            String title = alertRs.getString("title");
+            alertCombo.addItem(title);
+            alertIds.add(new int[]{id});
+            if (id == currentAlertID) selectedAlertIndex = idx;
+            idx++;
+        }
+        if (selectedAlertIndex >= 0) alertCombo.setSelectedIndex(selectedAlertIndex);
+
+        gbc.gridx = 1;
+        dialog.add(alertCombo, gbc);
+
+        // Line dropdown
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        dialog.add(new JLabel("Line:"), gbc);
+
+        JComboBox<String> lineCombo = new JComboBox<>();
+        java.util.List<int[]> lineIds = new java.util.ArrayList<>();
+        ResultSet lineRs = AlertLine.fetchAllLines(conn);
+        int selectedLineIndex = -1;
+        idx = 0;
+        while (lineRs.next()) {
+            int id = lineRs.getInt("lineID");
+            String name = lineRs.getString("name");
+            lineCombo.addItem(name);
+            lineIds.add(new int[]{id});
+            if (id == currentLineID) selectedLineIndex = idx;
+            idx++;
+        }
+        if (selectedLineIndex >= 0) lineCombo.setSelectedIndex(selectedLineIndex);
+
+        gbc.gridx = 1;
+        dialog.add(lineCombo, gbc);
+
+        // Save button
+        JButton saveBtn = new JButton("Save");
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 2;
+        dialog.add(saveBtn, gbc);
+
+        final int origAlertID = currentAlertID;
+        final int origLineID = currentLineID;
+        final java.util.List<int[]> finalAlertIds = alertIds;
+        final java.util.List<int[]> finalLineIds = lineIds;
+
+        saveBtn.addActionListener(ev -> {
+            try {
+                int newAlertID = finalAlertIds.get(alertCombo.getSelectedIndex())[0];
+                int newLineID = finalLineIds.get(lineCombo.getSelectedIndex())[0];
+
+                if (isCreate) {
+                    AlertLine.createAlertLine(conn, newAlertID, newLineID);
+                } else {
+                    AlertLine.updateAlertLine(conn, origAlertID, origLineID, newAlertID, newLineID);
+                }
+                dialog.dispose();
+                onShowLineAlerts(null);
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(dialog, "Error saving line alert: " + ex.getMessage(), "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        dialog.setVisible(true);
+    }
+
+    // Station Alert handlers
+
+    private void onShowStationAlerts(ActionEvent e) {
+        try {
+            currentTableType = "stationalerts";
+            ResultSet rs = AlertStation.fetchAllAlertStationsAsResultSet(conn);
+            populateTable(rs);
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error loading station alerts: " + ex.getMessage(), "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void onDeleteStationAlert(ActionEvent e) {
+        if (selectedRow < 0) {
+            JOptionPane.showMessageDialog(this, "Please select a station alert to delete");
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this station alert?",
+                "Confirm Delete", JOptionPane.YES_NO_OPTION);
+        if (confirm != JOptionPane.YES_OPTION)
+            return;
+
+        try {
+            DefaultTableModel model = (DefaultTableModel) resultTable.getModel();
+            int alertId = Integer.parseInt(model.getValueAt(selectedRow, 0).toString());
+            int stationId = Integer.parseInt(model.getValueAt(selectedRow, 2).toString());
+
+            AlertStation.deleteAlertStation(conn, alertId, stationId);
+            JOptionPane.showMessageDialog(this, "Station alert deleted successfully");
+            onShowStationAlerts(null);
+            selectedRow = -1;
+            deleteStationAlertBtn.setEnabled(false);
+            updateStationAlertBtn.setEnabled(false);
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error deleting station alert: " + ex.getMessage(), "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void onUpdateStationAlert(ActionEvent e) {
+        if (selectedRow < 0) {
+            JOptionPane.showMessageDialog(this, "Please select a station alert to update");
+            return;
+        }
+
+        try {
+            DefaultTableModel model = (DefaultTableModel) resultTable.getModel();
+            int alertId = Integer.parseInt(model.getValueAt(selectedRow, 0).toString());
+            int stationId = Integer.parseInt(model.getValueAt(selectedRow, 2).toString());
+
+            showStationAlertDialog(alertId, stationId, false);
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error loading station alert: " + ex.getMessage(), "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void onCreateStationAlert(ActionEvent e) {
+        try {
+            showStationAlertDialog(-1, -1, true);
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error opening create dialog: " + ex.getMessage(), "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void showStationAlertDialog(int currentAlertID, int currentStationID, boolean isCreate) throws SQLException {
+        JDialog dialog = new JDialog(this, isCreate ? "Create Station Alert" : "Update Station Alert", true);
+        dialog.setSize(450, 200);
+        dialog.setLocationRelativeTo(this);
+        dialog.setLayout(new GridBagLayout());
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.WEST;
+
+        // Alert dropdown
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        dialog.add(new JLabel("Alert:"), gbc);
+
+        JComboBox<String> alertCombo = new JComboBox<>();
+        java.util.List<int[]> alertIds = new java.util.ArrayList<>();
+        ResultSet alertRs = AlertStation.fetchAllAlerts(conn);
+        int selectedAlertIndex = -1;
+        int idx = 0;
+        while (alertRs.next()) {
+            int id = alertRs.getInt("alertID");
+            String title = alertRs.getString("title");
+            alertCombo.addItem(title);
+            alertIds.add(new int[]{id});
+            if (id == currentAlertID) selectedAlertIndex = idx;
+            idx++;
+        }
+        if (selectedAlertIndex >= 0) alertCombo.setSelectedIndex(selectedAlertIndex);
+
+        gbc.gridx = 1;
+        dialog.add(alertCombo, gbc);
+
+        // Station dropdown
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        dialog.add(new JLabel("Station:"), gbc);
+
+        JComboBox<String> stationCombo = new JComboBox<>();
+        java.util.List<int[]> stationIds = new java.util.ArrayList<>();
+        ResultSet stationRs = AlertStation.fetchAllStations(conn);
+        int selectedStationIndex = -1;
+        idx = 0;
+        while (stationRs.next()) {
+            int id = stationRs.getInt("stationID");
+            String name = stationRs.getString("name");
+            stationCombo.addItem(name);
+            stationIds.add(new int[]{id});
+            if (id == currentStationID) selectedStationIndex = idx;
+            idx++;
+        }
+        if (selectedStationIndex >= 0) stationCombo.setSelectedIndex(selectedStationIndex);
+
+        gbc.gridx = 1;
+        dialog.add(stationCombo, gbc);
+
+        // Save button
+        JButton saveBtn = new JButton("Save");
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 2;
+        dialog.add(saveBtn, gbc);
+
+        final int origAlertID = currentAlertID;
+        final int origStationID = currentStationID;
+        final java.util.List<int[]> finalAlertIds = alertIds;
+        final java.util.List<int[]> finalStationIds = stationIds;
+
+        saveBtn.addActionListener(ev -> {
+            try {
+                int newAlertID = finalAlertIds.get(alertCombo.getSelectedIndex())[0];
+                int newStationID = finalStationIds.get(stationCombo.getSelectedIndex())[0];
+
+                if (isCreate) {
+                    AlertStation.createAlertStation(conn, newAlertID, newStationID);
+                } else {
+                    AlertStation.updateAlertStation(conn, origAlertID, origStationID, newAlertID, newStationID);
+                }
+                dialog.dispose();
+                onShowStationAlerts(null);
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(dialog, "Error saving station alert: " + ex.getMessage(), "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        dialog.setVisible(true);
+    }
+
     private void populateTable(ResultSet rs) throws SQLException {
         ResultSetMetaData md = rs.getMetaData();
         int cols = md.getColumnCount();
@@ -277,9 +685,32 @@ public class CTAClient extends JFrame {
                     colNames[i] = "Price ($)";
                     break;
                 case "alertid":
-                    colNames[i] = "";
-                    break; // hidden
-                // Add more mappings as needed
+                    colNames[i] = "alertID";
+                    break;
+                case "fareid":
+                    colNames[i] = "fareID";
+                    break;
+                case "lineid":
+                    colNames[i] = "lineID";
+                    break;
+                case "alerttitle":
+                    colNames[i] = "Alert Title";
+                    break;
+                case "linename":
+                    colNames[i] = "Line Name";
+                    break;
+                case "stationid":
+                    colNames[i] = "stationID";
+                    break;
+                case "stationname":
+                    colNames[i] = "Station Name";
+                    break;
+                case "starttime":
+                    colNames[i] = "Start Time";
+                    break;
+                case "endtime":
+                    colNames[i] = "End Time";
+                    break;
                 default:
                     colNames[i] = dbCol;
             }
@@ -299,10 +730,10 @@ public class CTAClient extends JFrame {
         }
         resultTable.setModel(model);
 
-        // Remove ID columns (alertID and fareID) from view
+        // Remove ID columns from view
         for (int i = cols - 1; i >= 0; i--) {
             String colName = colNames[i];
-            if (colName.equalsIgnoreCase("alertID") || colName.equalsIgnoreCase("fareID")) {
+            if (colName.equalsIgnoreCase("alertID") || colName.equalsIgnoreCase("fareID") || colName.equalsIgnoreCase("lineID") || colName.equalsIgnoreCase("stationID")) {
                 resultTable.getColumnModel().removeColumn(resultTable.getColumnModel().getColumn(i));
             }
         }
