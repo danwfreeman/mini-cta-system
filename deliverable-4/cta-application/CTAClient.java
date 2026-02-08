@@ -37,7 +37,8 @@ public class CTAClient extends JFrame {
 
     private void onExecute(ActionEvent e) {
         String sql = sqlArea.getText().trim();
-        if (sql.isEmpty()) return;
+        if (sql.isEmpty())
+            return;
 
         try (Statement st = conn.createStatement()) {
             boolean isResultSet = st.execute(sql);
@@ -59,12 +60,14 @@ public class CTAClient extends JFrame {
         ResultSetMetaData md = rs.getMetaData();
         int cols = md.getColumnCount();
         String[] colNames = new String[cols];
-        for (int i = 0; i < cols; i++) colNames[i] = md.getColumnLabel(i + 1);
+        for (int i = 0; i < cols; i++)
+            colNames[i] = md.getColumnLabel(i + 1);
 
         DefaultTableModel model = new DefaultTableModel(colNames, 0);
         while (rs.next()) {
             Object[] row = new Object[cols];
-            for (int i = 0; i < cols; i++) row[i] = rs.getObject(i + 1);
+            for (int i = 0; i < cols; i++)
+                row[i] = rs.getObject(i + 1);
             model.addRow(row);
         }
         resultTable.setModel(model);
@@ -78,12 +81,14 @@ public class CTAClient extends JFrame {
                 url = String.format("jdbc:mysql://%s:%d?serverTimezone=UTC", host, port);
                 conn = DriverManager.getConnection(url, user, password);
             } else {
-                url = String.format("jdbc:mysql://%s:%d/%s?serverTimezone=UTC&allowMultiQueries=true", host, port, database);
+                url = String.format("jdbc:mysql://%s:%d/%s?serverTimezone=UTC&allowMultiQueries=true", host, port,
+                        database);
                 conn = DriverManager.getConnection(url, user, password);
             }
             return true;
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Connection failed: " + ex.getMessage(), "Connection Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Connection failed: " + ex.getMessage(), "Connection Error",
+                    JOptionPane.ERROR_MESSAGE);
             return false;
         }
     }
@@ -96,10 +101,11 @@ public class CTAClient extends JFrame {
             int port = 3306;
             String user = "root";
             String password = "";
-            String database = "chicago_cta";    
+            String database = "chicago_cta";
 
             boolean ok = app.connect(host, port, user, password, database);
-            if (!ok) System.exit(1);
+            if (!ok)
+                System.exit(1);
 
             app.execBtn.setEnabled(true);
             app.setVisible(true);
