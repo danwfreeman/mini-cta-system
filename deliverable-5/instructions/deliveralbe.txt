@@ -1,0 +1,14 @@
+Deliverable #5
+5th Deliverable (For Credit: Extend program)
+
+Extend the program developed in the 4th deliverable to encompass a range of challenging/complex SQL queries, including:
+    set operations
+    set membership
+    set comparison
+    subqueries using the WITH clause
+    advanced aggregate functions
+    and OLAP
+
+Furthermore, your program or application should include a user-friendly interface with menus, buttons, icons, etc.
+The application's functionality should be demonstrated through a video recording via Loom.
+
