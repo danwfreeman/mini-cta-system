@@ -11,6 +11,7 @@ import java.sql.*;
 public class CTAClient extends JFrame {
     private Connection conn;
     private JTable resultTable;
+    private JTable tripResultTable;
     private JButton deleteAlertBtn;
     private JButton updateAlertBtn;
     private JButton deleteFareBtn;
@@ -24,7 +25,9 @@ public class CTAClient extends JFrame {
     private CardLayout centerCardLayout;
     private JPanel centerCards;
     private JPanel lineDetailPanel;
-    private JComboBox<String> lineSelectDropdown;
+    private JPanel transferLineDetailPanel;
+    private JLabel startLineLabel;
+    private JLabel transferLineLabelValue;
     private JComboBox<String> startStationDropdown;
     private JComboBox<String> endStationDropdown;
 
@@ -196,15 +199,11 @@ public class CTAClient extends JFrame {
         stationAlertsRow.add(stationAlertButtonPanel);
 
         // View Line Detail section
-        lineSelectDropdown = new JComboBox<>();
-        lineSelectDropdown.addActionListener(e -> {
-            if (lineSelectDropdown.getSelectedItem() != null) {
-                onLineSelected((String) lineSelectDropdown.getSelectedItem());
-            }
-        });
+        startLineLabel = new JLabel("");
+        startLineLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
         JPanel lineDetailButtonPanel = new JPanel();
-        lineDetailButtonPanel.add(new JLabel("Select a Line:"));
-        lineDetailButtonPanel.add(lineSelectDropdown);
+        lineDetailButtonPanel.add(new JLabel("Start Line:"));
+        lineDetailButtonPanel.add(startLineLabel);
 
         JPanel lineDetailRow = new JPanel();
         lineDetailRow.add(lineDetailButtonPanel);
@@ -214,6 +213,20 @@ public class CTAClient extends JFrame {
         lineDetailPanel.setLayout(new BoxLayout(lineDetailPanel, BoxLayout.Y_AXIS));
         JScrollPane lineDetailScroll = new JScrollPane(lineDetailPanel);
 
+        // Transfer line detail section (second line, shown on transfers)
+        transferLineLabelValue = new JLabel("");
+        transferLineLabelValue.setFont(new Font("SansSerif", Font.BOLD, 14));
+        JPanel transferLineButtonPanel = new JPanel();
+        transferLineButtonPanel.add(new JLabel("Transfer Line:"));
+        transferLineButtonPanel.add(transferLineLabelValue);
+
+        JPanel transferLineRow = new JPanel();
+        transferLineRow.add(transferLineButtonPanel);
+
+        transferLineDetailPanel = new JPanel();
+        transferLineDetailPanel.setLayout(new BoxLayout(transferLineDetailPanel, BoxLayout.Y_AXIS));
+        JScrollPane transferLineDetailScroll = new JScrollPane(transferLineDetailPanel);
+
         // CardLayout to swap button rows
         CardLayout cardLayout = new CardLayout();
         JPanel buttonCards = new JPanel(cardLayout);
@@ -222,11 +235,11 @@ public class CTAClient extends JFrame {
         buttonCards.add(lineAlertsRow, "Manage Line Alerts");
         buttonCards.add(stationAlertsRow, "Manage Station Alerts");
 
-        // CardLayout to swap center content between table and line detail
-        centerCardLayout = new CardLayout();
-        centerCards = new JPanel(centerCardLayout);
-        centerCards.add(resultScroll, "table");
-        centerCards.add(lineDetailScroll, "linedetail");
+        // Trip result table (for the user trip planner, separate from admin table)
+        tripResultTable = new JTable();
+        JTableHeader tripHeader = tripResultTable.getTableHeader();
+        tripHeader.setFont(new Font("SansSerif", Font.BOLD, 16));
+        JScrollPane tripResultScroll = new JScrollPane(tripResultTable);
 
         JComboBox<String> manageDropdown = new JComboBox<>(new String[]{
             "Manage Fares", "Manage Alerts", "Manage Line Alerts", "Manage Station Alerts"
@@ -234,7 +247,7 @@ public class CTAClient extends JFrame {
         manageDropdown.addActionListener(e -> {
             String selected = (String) manageDropdown.getSelectedItem();
             cardLayout.show(buttonCards, selected);
-            centerCardLayout.show(centerCards, "table");
+            centerCardLayout.show(centerCards, "admin");
             switch (selected) {
                 case "Manage Fares":
                     onShowFares(null);
@@ -284,53 +297,58 @@ public class CTAClient extends JFrame {
         tripBottomRow.add(new JLabel("End Station:"));
         tripBottomRow.add(endStationDropdown);
 
-        JPanel tripPlannerRow = new JPanel();
-        tripPlannerRow.setLayout(new BoxLayout(tripPlannerRow, BoxLayout.Y_AXIS));
-        tripPlannerRow.add(tripTopRow);
-        tripPlannerRow.add(tripBottomRow);
+        JPanel tripPlannerControls = new JPanel();
+        tripPlannerControls.setLayout(new BoxLayout(tripPlannerControls, BoxLayout.Y_AXIS));
+        tripPlannerControls.add(tripTopRow);
+        tripPlannerControls.add(tripBottomRow);
 
-        // User sub-panel card layout for switching between line detail row and trip planner row
-        CardLayout userCardLayout = new CardLayout();
-        JPanel userButtonCards = new JPanel(userCardLayout);
-        userButtonCards.add(lineDetailRow, "View Line Detail");
-        userButtonCards.add(tripPlannerRow, "Trip Planner");
+        // Right side: trip planner controls + trip result table
+        JPanel tripPlannerPanel = new JPanel(new BorderLayout());
+        tripPlannerPanel.add(tripPlannerControls, BorderLayout.NORTH);
+        tripPlannerPanel.add(tripResultScroll, BorderLayout.CENTER);
 
-        // User panel with View Line Detail and Trip Planner
-        JComboBox<String> userDropdown = new JComboBox<>(new String[]{"View Line Detail", "Trip Planner"});
-        userDropdown.addActionListener(e -> {
-            String selected = (String) userDropdown.getSelectedItem();
-            userCardLayout.show(userButtonCards, selected);
-            if ("View Line Detail".equals(selected)) {
-                centerCardLayout.show(centerCards, "linedetail");
-                loadLineDropdown();
-            } else if ("Trip Planner".equals(selected)) {
-                centerCardLayout.show(centerCards, "table");
-                loadStationDropdowns();
-            }
-        });
-        JPanel userDropdownRow = new JPanel();
-        userDropdownRow.add(new JLabel("Select:"));
-        userDropdownRow.add(userDropdown);
-        JPanel userPanel = new JPanel();
-        userPanel.setLayout(new BoxLayout(userPanel, BoxLayout.Y_AXIS));
-        userPanel.add(userDropdownRow);
-        userPanel.add(userButtonCards);
+        // Left side: first line detail + transfer line detail stacked vertically
+        JPanel firstLinePanel = new JPanel(new BorderLayout());
+        firstLinePanel.add(lineDetailRow, BorderLayout.NORTH);
+        firstLinePanel.add(lineDetailScroll, BorderLayout.CENTER);
 
-        // CardLayout to swap between admin and user views
+        JPanel secondLinePanel = new JPanel(new BorderLayout());
+        secondLinePanel.add(transferLineRow, BorderLayout.NORTH);
+        secondLinePanel.add(transferLineDetailScroll, BorderLayout.CENTER);
+
+        JSplitPane linesSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, firstLinePanel, secondLinePanel);
+        linesSplitPane.setResizeWeight(0.5);
+
+        // User split pane: left = line details, right = trip planner
+        JSplitPane userSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, linesSplitPane, tripPlannerPanel);
+        userSplitPane.setResizeWeight(0.4);
+        userSplitPane.setDividerLocation(700);
+
+        // CardLayout to swap center content between admin table and user split view
+        centerCardLayout = new CardLayout();
+        centerCards = new JPanel(centerCardLayout);
+        centerCards.add(resultScroll, "admin");
+        centerCards.add(userSplitPane, "user");
+
+        // CardLayout to swap between admin and user top controls
         CardLayout roleCardLayout = new CardLayout();
         JPanel roleCards = new JPanel(roleCardLayout);
         roleCards.add(adminPanel, "admin");
-        roleCards.add(userPanel, "user");
+
+        // Empty placeholder for user (controls are in the split pane)
+        JPanel userTopPlaceholder = new JPanel();
+        roleCards.add(userTopPlaceholder, "user");
 
         adminRadio.addActionListener(e2 -> {
             roleCardLayout.show(roleCards, "admin");
+            centerCardLayout.show(centerCards, "admin");
             onShowFares(null);
-            centerCardLayout.show(centerCards, "table");
         });
         userRadio.addActionListener(e2 -> {
             roleCardLayout.show(roleCards, "user");
-            centerCardLayout.show(centerCards, "linedetail");
+            centerCardLayout.show(centerCards, "user");
             loadLineDropdown();
+            loadStationDropdowns();
         });
 
         JPanel topPanel = new JPanel(new BorderLayout());
@@ -623,16 +641,15 @@ public class CTAClient extends JFrame {
     }
 
     private void loadLineDropdown() {
-        try {
-            lineSelectDropdown.removeAllItems();
-            ResultSet rs = LineDetail.fetchAllLineNames(conn);
-            while (rs.next()) {
-                lineSelectDropdown.addItem(rs.getString("name"));
-            }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error loading lines: " + ex.getMessage(), "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        }
+        // No dropdowns to populate; clear labels and panels
+        startLineLabel.setText("");
+        transferLineLabelValue.setText("");
+        lineDetailPanel.removeAll();
+        lineDetailPanel.revalidate();
+        lineDetailPanel.repaint();
+        transferLineDetailPanel.removeAll();
+        transferLineDetailPanel.revalidate();
+        transferLineDetailPanel.repaint();
     }
 
     private void onPlanTrip() {
@@ -650,24 +667,49 @@ public class CTAClient extends JFrame {
         }
 
         try {
-            // 1. Check for a direct route (shared line)
-            String directSql = "SELECT DISTINCT l.name AS lineName, l.mode " +
+            String[] colNames = {"Type", "Station", "Line"};
+            DefaultTableModel model = new DefaultTableModel(colNames, 0) {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
+            };
+
+            // simple case, there is one line that serves both start and end station, show and return
+            // self join pattern to find lines that have both stations, group by line and count distinct stations to ensure both are served by the same line
+            // this is a relational division pattern, find entities related to all of a set (two stations in this case)
+            String directSql = "SELECT l.name AS lineName " +
                     "FROM Line l " +
-                    "JOIN StationLine sl1 ON sl1.lineID = l.lineID " +
-                    "JOIN StationLine sl2 ON sl2.lineID = l.lineID " +
-                    "JOIN Station s1 ON s1.stationID = sl1.stationID " +
-                    "JOIN Station s2 ON s2.stationID = sl2.stationID " +
-                    "WHERE s1.name = ? AND s2.name = ?";
+                    "JOIN StationLine sl ON sl.lineID = l.lineID " +
+                    "JOIN Station s ON s.stationID = sl.stationID " +
+                    "WHERE s.name IN (?, ?) " +
+                    "GROUP BY l.lineID, l.name " +
+                    "HAVING COUNT(DISTINCT s.name) = 2";
             PreparedStatement pstmt = conn.prepareStatement(directSql);
             pstmt.setString(1, startStation);
             pstmt.setString(2, endStation);
             ResultSet rs = pstmt.executeQuery();
             if (rs.isBeforeFirst()) {
-                populateTable(rs);
+                // Use the first shared line for a clean 2-row display
+                rs.next();
+                String lineName = rs.getString("lineName");
+                model.addRow(new Object[]{"Start Station", startStation, lineName});
+                model.addRow(new Object[]{"End Station", endStation, lineName});
+                tripResultTable.setModel(model);
+                startLineLabel.setText(lineName);
+                onLineSelected(lineName, lineDetailPanel);
+                // Clear transfer line for direct route
+                transferLineLabelValue.setText("");
+                transferLineDetailPanel.removeAll();
+                transferLineDetailPanel.revalidate();
+                transferLineDetailPanel.repaint();
                 return;
             }
 
-            // 2. Check for one-transfer route
+            // no direct rooute, check if we have a shared station between 2 lines (1 transfer only)
+            // if s.name exists and the lines are different, and the name is not that same as the start or end name (station), then we are good
+            // this would be a set membership query using IN
+            // this enforces 1 transfer because we are looking at one station to server 2 distinct lines
             String transferSql = "SELECT DISTINCT s.name AS transferStation, l1.name AS takeLine, l2.name AS transferToLine " +
                     "FROM Station s " +
                     "JOIN StationLine slA ON slA.stationID = s.stationID " +
@@ -683,8 +725,7 @@ public class CTAClient extends JFrame {
                     "    JOIN Station st ON st.stationID = sl.stationID WHERE st.name = ? " +
                     ") " +
                     "AND slA.lineID <> slB.lineID " +
-                    "AND s.name NOT IN (?, ?) " +
-                    "ORDER BY s.name";
+                    "AND s.name NOT IN (?, ?) ";
             PreparedStatement pstmt2 = conn.prepareStatement(transferSql);
             pstmt2.setString(1, startStation);
             pstmt2.setString(2, endStation);
@@ -692,11 +733,24 @@ public class CTAClient extends JFrame {
             pstmt2.setString(4, endStation);
             ResultSet rs2 = pstmt2.executeQuery();
             if (rs2.isBeforeFirst()) {
-                populateTable(rs2);
+                // we force 4 lines here, since we know we have a start, transfer from, transfer to, and end station, basically duplicating the transfer station for to/from clarity for display purposes
+                rs2.next();
+                String transferStation = rs2.getString("transferStation");
+                String takeLine = rs2.getString("takeLine");
+                String transferToLine = rs2.getString("transferToLine");
+                model.addRow(new Object[]{"Start Station", startStation, takeLine});
+                model.addRow(new Object[]{"Transfer From", transferStation, takeLine});
+                model.addRow(new Object[]{"Transfer To", transferStation, transferToLine});
+                model.addRow(new Object[]{"End Station", endStation, transferToLine});
+                tripResultTable.setModel(model);
+                startLineLabel.setText(takeLine);
+                onLineSelected(takeLine, lineDetailPanel);
+                transferLineLabelValue.setText(transferToLine);
+                onLineSelected(transferToLine, transferLineDetailPanel);
                 return;
             }
 
-            // 3. No route found
+            // no direct route, and no one transfer route, show message and return
             JOptionPane.showMessageDialog(this, "Can't plan that trip — no direct or one-transfer route found.");
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error planning trip: " + ex.getMessage(), "Error",
@@ -724,10 +778,10 @@ public class CTAClient extends JFrame {
         }
     }
 
-    private void onLineSelected(String lineName) {
+    private void onLineSelected(String lineName, JPanel targetPanel) {
         try {
             ResultSet rs = LineDetail.fetchLineStops(conn, lineName);
-            LineDetail.renderLineDetail(lineDetailPanel, rs, lineName);
+            LineDetail.renderLineDetail(targetPanel, rs, lineName);
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error loading line detail: " + ex.getMessage(), "Error",
                     JOptionPane.ERROR_MESSAGE);
