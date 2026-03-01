@@ -22,56 +22,7 @@ BEGIN
   ORDER BY sl.stopSequence;
 END$$
 
-DROP PROCEDURE IF EXISTS sp_get_window_wait_times$$
-CREATE PROCEDURE sp_get_window_wait_times (
-  IN p_lineName VARCHAR(100),
-  IN p_stationName VARCHAR(100),
-  IN p_dayType VARCHAR(20),
-  IN p_direction VARCHAR(20),
-  IN p_startTime TIME,
-  IN p_endTime TIME
-)
-BEGIN
-  SELECT
-    t.lineName,
-    t.stationName,
-    t.dayType,
-    t.direction,
-    t.arrivalTime,
-    t.nextArrivalTime,
-    t.minutesUntilNext
-  FROM (
-    SELECT
-      l.name AS lineName,
-      s.name AS stationName,
-      tt.dayType,
-      tt.direction,
-      tt.timeOfDay AS arrivalTime,
-      LEAD(tt.timeOfDay) OVER (
-        PARTITION BY tt.lineID, tt.stationID, tt.dayType, tt.direction
-        ORDER BY tt.timeOfDay
-      ) AS nextArrivalTime,
-      TIMESTAMPDIFF(
-        MINUTE,
-        tt.timeOfDay,
-        LEAD(tt.timeOfDay) OVER (
-          PARTITION BY tt.lineID, tt.stationID, tt.dayType, tt.direction
-          ORDER BY tt.timeOfDay
-        )
-      ) AS minutesUntilNext
-    FROM TimeTable tt
-    JOIN Line l    ON l.lineID = tt.lineID
-    JOIN Station s ON s.stationID = tt.stationID
-    WHERE l.name = p_lineName
-      AND s.name = p_stationName
-      AND tt.dayType = p_dayType
-      AND tt.direction = p_direction
-      AND tt.timeOfDay >= p_startTime
-      AND tt.timeOfDay < p_endTime
-  ) t
-  WHERE t.nextArrivalTime IS NOT NULL
-  ORDER BY t.arrivalTime;
-END$$
+
 
 DROP PROCEDURE IF EXISTS sp_get_trip_schedule$$
 CREATE PROCEDURE sp_get_trip_schedule (
