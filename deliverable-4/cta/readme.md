@@ -6,6 +6,7 @@ From the website https://www.transitchicago.com/ this program has created sample
 - viewing fares
 - viewing system alerts (system wide, by station, by line)
 - viewing all stops on a particular line
+- viewing train wait times between arrivals for a 2-hour window (by line/station/day/direction)
 
 ### Setup 
 - install [MySQL Workbench](https://www.mysql.com/products/workbench/)
@@ -51,3 +52,12 @@ From the website https://www.transitchicago.com/ this program has created sample
 
 - Line Detail
     - for each line shows a graphical view of the stops in order and if they are accessible (for train and bus lines)
+
+- Window Wait Times
+    - choose line, station, day type, direction, and a 2-hour time window
+    - returns each arrival, the next arrival, and minutes until next train
+    - filters out rows where no next arrival exists in-window
+
+- Loom Video Link
+
+    - https://www.loom.com/share/fad65a861faa4a74b003ffff49607c65
