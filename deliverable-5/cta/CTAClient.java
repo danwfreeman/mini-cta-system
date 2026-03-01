@@ -262,12 +262,32 @@ public class CTAClient extends JFrame {
         // Trip Planner section
         startStationDropdown = new JComboBox<>();
         endStationDropdown = new JComboBox<>();
+
+        JComboBox<String> dayOfWeekDropdown = new JComboBox<>(new String[]{"Weekday", "Saturday", "Sunday/Holiday"});
+        JComboBox<String> directionDropdown = new JComboBox<>(new String[]{"Northbound", "Southbound", "Eastbound", "Westbound"});
+        JButton planTripButton = new JButton("Plan Trip");
+        planTripButton.addActionListener(e -> onPlanTrip());
+
+        JPanel tripTopRow = new JPanel();
+        tripTopRow.add(new JLabel("Day of Week:"));
+        tripTopRow.add(dayOfWeekDropdown);
+        tripTopRow.add(Box.createHorizontalStrut(20));
+        tripTopRow.add(new JLabel("Direction:"));
+        tripTopRow.add(directionDropdown);
+        tripTopRow.add(Box.createHorizontalStrut(20));
+        tripTopRow.add(planTripButton);
+
+        JPanel tripBottomRow = new JPanel();
+        tripBottomRow.add(new JLabel("Start Station:"));
+        tripBottomRow.add(startStationDropdown);
+        tripBottomRow.add(Box.createHorizontalStrut(20));
+        tripBottomRow.add(new JLabel("End Station:"));
+        tripBottomRow.add(endStationDropdown);
+
         JPanel tripPlannerRow = new JPanel();
-        tripPlannerRow.add(new JLabel("Start Station:"));
-        tripPlannerRow.add(startStationDropdown);
-        tripPlannerRow.add(Box.createHorizontalStrut(20));
-        tripPlannerRow.add(new JLabel("End Station:"));
-        tripPlannerRow.add(endStationDropdown);
+        tripPlannerRow.setLayout(new BoxLayout(tripPlannerRow, BoxLayout.Y_AXIS));
+        tripPlannerRow.add(tripTopRow);
+        tripPlannerRow.add(tripBottomRow);
 
         // User sub-panel card layout for switching between line detail row and trip planner row
         CardLayout userCardLayout = new CardLayout();
@@ -611,6 +631,75 @@ public class CTAClient extends JFrame {
             }
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error loading lines: " + ex.getMessage(), "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void onPlanTrip() {
+        String startLabel = (String) startStationDropdown.getSelectedItem();
+        String endLabel = (String) endStationDropdown.getSelectedItem();
+        if (startLabel == null || endLabel == null) {
+            JOptionPane.showMessageDialog(this, "Please select both a start and end station.");
+            return;
+        }
+        String startStation = startLabel.replaceAll("\\s*\\(.*\\)$", "");
+        String endStation = endLabel.replaceAll("\\s*\\(.*\\)$", "");
+        if (startStation.equals(endStation)) {
+            JOptionPane.showMessageDialog(this, "Start and end stations must be different.");
+            return;
+        }
+
+        try {
+            // 1. Check for a direct route (shared line)
+            String directSql = "SELECT DISTINCT l.name AS lineName, l.mode " +
+                    "FROM Line l " +
+                    "JOIN StationLine sl1 ON sl1.lineID = l.lineID " +
+                    "JOIN StationLine sl2 ON sl2.lineID = l.lineID " +
+                    "JOIN Station s1 ON s1.stationID = sl1.stationID " +
+                    "JOIN Station s2 ON s2.stationID = sl2.stationID " +
+                    "WHERE s1.name = ? AND s2.name = ?";
+            PreparedStatement pstmt = conn.prepareStatement(directSql);
+            pstmt.setString(1, startStation);
+            pstmt.setString(2, endStation);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.isBeforeFirst()) {
+                populateTable(rs);
+                return;
+            }
+
+            // 2. Check for one-transfer route
+            String transferSql = "SELECT DISTINCT s.name AS transferStation, l1.name AS takeLine, l2.name AS transferToLine " +
+                    "FROM Station s " +
+                    "JOIN StationLine slA ON slA.stationID = s.stationID " +
+                    "JOIN StationLine slB ON slB.stationID = s.stationID " +
+                    "JOIN Line l1 ON l1.lineID = slA.lineID " +
+                    "JOIN Line l2 ON l2.lineID = slB.lineID " +
+                    "WHERE slA.lineID IN ( " +
+                    "    SELECT sl.lineID FROM StationLine sl " +
+                    "    JOIN Station st ON st.stationID = sl.stationID WHERE st.name = ? " +
+                    ") " +
+                    "AND slB.lineID IN ( " +
+                    "    SELECT sl.lineID FROM StationLine sl " +
+                    "    JOIN Station st ON st.stationID = sl.stationID WHERE st.name = ? " +
+                    ") " +
+                    "AND slA.lineID <> slB.lineID " +
+                    "AND s.name NOT IN (?, ?) " +
+                    "ORDER BY s.name";
+            PreparedStatement pstmt2 = conn.prepareStatement(transferSql);
+            pstmt2.setString(1, startStation);
+            pstmt2.setString(2, endStation);
+            pstmt2.setString(3, startStation);
+            pstmt2.setString(4, endStation);
+            ResultSet rs2 = pstmt2.executeQuery();
+            if (rs2.isBeforeFirst()) {
+                populateTable(rs2);
+                return;
+            }
+
+            // 3. No route found
+            JOptionPane.showMessageDialog(this, "Can't plan that trip — no direct or one-transfer route found.");
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error planning trip: " + ex.getMessage(), "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
     }
