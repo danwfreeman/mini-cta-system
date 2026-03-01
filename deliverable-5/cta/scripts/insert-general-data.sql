@@ -132,25 +132,6 @@ INSERT INTO StationLine (stationID, lineID, stopSequence) VALUES
 (1017, 14, 4);  -- Shore Drive
 
 
--- A few sample times across lines, stations, day types, directions
-INSERT INTO TimeTable (timetableID, lineID, stationID, dayType, timeOfDay, direction) VALUES
-(2001, 1, 1001, 'weekday',        '06:05:00', 'southbound'),
-(2002, 1, 1002, 'weekday',        '06:18:00', 'southbound'),
-(2003, 1, 1004, 'weekday',        '06:40:00', 'southbound'),
-(2004, 1, 1008, 'weekday',        '07:20:00', 'southbound'),
-(2005, 1, 1008, 'weekday',        '17:10:00', 'northbound'),
-
-(2006, 2, 1007, 'weekday',        '06:12:00', 'eastbound'),
-(2007, 2, 1006, 'weekday',        '06:52:00', 'eastbound'),
-(2008, 2, 1004, 'weekday',        '07:05:00', 'eastbound'),
-(2009, 2, 1004, 'saturday',       '10:15:00', 'westbound'),
-(2010, 2, 1007, 'sunday_holiday', '22:40:00', 'westbound'),
-
-(2011, 9, 1011, 'weekday',        '05:10:00', 'northbound'),
-(2012, 9, 1012, 'weekday',        '05:55:00', 'southbound'),
-(2014, 15,1014, 'saturday',       '12:20:00', 'northbound'),
-(2015, 14,1015, 'sunday_holiday', '14:05:00', 'eastbound');
-
 -- Amounts based on CTA fare chart:
 -- Rail $2.50 full / $1.25 reduced / $0.75 student
 -- Bus  $2.25 full / $1.10 reduced / $0.75 student

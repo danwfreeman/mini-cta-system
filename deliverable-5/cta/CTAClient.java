@@ -30,6 +30,12 @@ public class CTAClient extends JFrame {
     private JLabel transferLineLabelValue;
     private JComboBox<String> startStationDropdown;
     private JComboBox<String> endStationDropdown;
+    private JComboBox<String> dayOfWeekDropdown;
+
+    private JTable scheduleTable1;
+    private JTable scheduleTable2;
+    private JLabel scheduleLabel1;
+    private JLabel scheduleLabel2;
 
     public CTAClient() {
         super("CTA");
@@ -177,13 +183,15 @@ public class CTAClient extends JFrame {
         JRadioButton adminRadio = new JRadioButton("Administrator");
         JRadioButton userRadio = new JRadioButton("User");
         ButtonGroup roleGroup = new ButtonGroup();
-        roleGroup.add(adminRadio);
+
         roleGroup.add(userRadio);
-        adminRadio.setSelected(true);
+        roleGroup.add(adminRadio);
+        userRadio.setSelected(true);
 
         JPanel radioPanel = new JPanel();
-        radioPanel.add(adminRadio);
+
         radioPanel.add(userRadio);
+        radioPanel.add(adminRadio);
         headerPanel.add(radioPanel, BorderLayout.SOUTH);
 
         JPanel faresRow = new JPanel();
@@ -276,17 +284,13 @@ public class CTAClient extends JFrame {
         startStationDropdown = new JComboBox<>();
         endStationDropdown = new JComboBox<>();
 
-        JComboBox<String> dayOfWeekDropdown = new JComboBox<>(new String[]{"Weekday", "Saturday", "Sunday/Holiday"});
-        JComboBox<String> directionDropdown = new JComboBox<>(new String[]{"Northbound", "Southbound", "Eastbound", "Westbound"});
+        dayOfWeekDropdown = new JComboBox<>(new String[]{"Weekday", "Saturday", "Sunday/Holiday"});
         JButton planTripButton = new JButton("Plan Trip");
         planTripButton.addActionListener(e -> onPlanTrip());
 
         JPanel tripTopRow = new JPanel();
         tripTopRow.add(new JLabel("Day of Week:"));
         tripTopRow.add(dayOfWeekDropdown);
-        tripTopRow.add(Box.createHorizontalStrut(20));
-        tripTopRow.add(new JLabel("Direction:"));
-        tripTopRow.add(directionDropdown);
         tripTopRow.add(Box.createHorizontalStrut(20));
         tripTopRow.add(planTripButton);
 
@@ -302,10 +306,41 @@ public class CTAClient extends JFrame {
         tripPlannerControls.add(tripTopRow);
         tripPlannerControls.add(tripBottomRow);
 
-        // Right side: trip planner controls + trip result table
+        // Schedule tables for trip schedule results
+        scheduleTable1 = new JTable();
+        JTableHeader sched1Header = scheduleTable1.getTableHeader();
+        sched1Header.setFont(new Font("SansSerif", Font.BOLD, 14));
+        JScrollPane scheduleScroll1 = new JScrollPane(scheduleTable1);
+
+        scheduleLabel1 = new JLabel(" ");
+        scheduleLabel1.setFont(new Font("SansSerif", Font.BOLD, 12));
+        JPanel schedulePanel1 = new JPanel(new BorderLayout());
+        schedulePanel1.add(scheduleLabel1, BorderLayout.NORTH);
+        schedulePanel1.add(scheduleScroll1, BorderLayout.CENTER);
+
+        scheduleTable2 = new JTable();
+        JTableHeader sched2Header = scheduleTable2.getTableHeader();
+        sched2Header.setFont(new Font("SansSerif", Font.BOLD, 14));
+        JScrollPane scheduleScroll2 = new JScrollPane(scheduleTable2);
+
+        scheduleLabel2 = new JLabel(" ");
+        scheduleLabel2.setFont(new Font("SansSerif", Font.BOLD, 12));
+        JPanel schedulePanel2 = new JPanel(new BorderLayout());
+        schedulePanel2.add(scheduleLabel2, BorderLayout.NORTH);
+        schedulePanel2.add(scheduleScroll2, BorderLayout.CENTER);
+
+        // Side-by-side schedule tables panel
+        JSplitPane scheduleSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, schedulePanel1, schedulePanel2);
+        scheduleSplitPane.setResizeWeight(0.5);
+
+        // Trip result table top 40%, schedule tables bottom 60%
+        JSplitPane tripContentSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, tripResultScroll, scheduleSplitPane);
+        tripContentSplit.setResizeWeight(0.4);
+
+        // Left side: trip planner controls + trip content (table + schedules)
         JPanel tripPlannerPanel = new JPanel(new BorderLayout());
         tripPlannerPanel.add(tripPlannerControls, BorderLayout.NORTH);
-        tripPlannerPanel.add(tripResultScroll, BorderLayout.CENTER);
+        tripPlannerPanel.add(tripContentSplit, BorderLayout.CENTER);
 
         // Left side: first line detail + transfer line detail stacked vertically
         JPanel firstLinePanel = new JPanel(new BorderLayout());
@@ -319,10 +354,10 @@ public class CTAClient extends JFrame {
         JSplitPane linesSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, firstLinePanel, secondLinePanel);
         linesSplitPane.setResizeWeight(0.5);
 
-        // User split pane: left = line details, right = trip planner
-        JSplitPane userSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, linesSplitPane, tripPlannerPanel);
-        userSplitPane.setResizeWeight(0.4);
-        userSplitPane.setDividerLocation(700);
+        // User split pane: left = trip planner, right = line details
+        JSplitPane userSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tripPlannerPanel, linesSplitPane);
+        userSplitPane.setResizeWeight(0.75);
+        userSplitPane.setDividerLocation(1500);
 
         // CardLayout to swap center content between admin table and user split view
         centerCardLayout = new CardLayout();
@@ -357,6 +392,10 @@ public class CTAClient extends JFrame {
 
         add(topPanel, BorderLayout.NORTH);
         add(centerCards, BorderLayout.CENTER);
+
+        // Show user view on startup since userRadio is selected
+        roleCardLayout.show(roleCards, "user");
+        centerCardLayout.show(centerCards, "user");
     }
 
     private void onShowAlerts(ActionEvent e) {
@@ -703,6 +742,11 @@ public class CTAClient extends JFrame {
                 transferLineDetailPanel.removeAll();
                 transferLineDetailPanel.revalidate();
                 transferLineDetailPanel.repaint();
+                // Load trip schedule for the single line
+                String dayType = getDayTypeParam();
+                loadTripSchedule(lineName, startStation, endStation, dayType, "northbound", scheduleTable1, scheduleLabel1);
+                clearTable(scheduleTable2);
+                scheduleLabel2.setText(" ");
                 return;
             }
 
@@ -747,6 +791,10 @@ public class CTAClient extends JFrame {
                 onLineSelected(takeLine, lineDetailPanel);
                 transferLineLabelValue.setText(transferToLine);
                 onLineSelected(transferToLine, transferLineDetailPanel);
+                // Load trip schedules for both legs
+                String dayType = getDayTypeParam();
+                loadTripSchedule(takeLine, startStation, transferStation, dayType, "northbound", scheduleTable1, scheduleLabel1);
+                loadTripSchedule(transferToLine, transferStation, endStation, dayType, "northbound", scheduleTable2, scheduleLabel2);
                 return;
             }
 
@@ -756,6 +804,67 @@ public class CTAClient extends JFrame {
             JOptionPane.showMessageDialog(this, "Error planning trip: " + ex.getMessage(), "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private String getDayTypeParam() {
+        String selected = (String) dayOfWeekDropdown.getSelectedItem();
+        return switch (selected) {
+            case "Saturday" -> "saturday";
+            case "Sunday/Holiday" -> "sunday_holiday";
+            default -> "weekday";
+        };
+    }
+
+
+
+    private void loadTripSchedule(String lineName, String startStation, String endStation,
+                                   String dayType, String direction, JTable targetTable, JLabel infoLabel) {
+        try {
+            String usedDirection = direction;
+            DefaultTableModel model = callTripSchedule(lineName, startStation, endStation, dayType, usedDirection);
+            // If no results, flip direction and retry
+            if (model.getRowCount() == 0) {
+                usedDirection = direction.equals("northbound") ? "southbound" : "northbound";
+                model = callTripSchedule(lineName, startStation, endStation, dayType, usedDirection);
+            }
+            targetTable.setModel(model);
+            infoLabel.setText(lineName + "  |  " + startStation + " → " + endStation + "  |  " + usedDirection);
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error loading trip schedule: " + ex.getMessage(), "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private DefaultTableModel callTripSchedule(String lineName, String startStation, String endStation,
+                                                String dayType, String direction) throws SQLException {
+        CallableStatement cs = conn.prepareCall("{CALL sp_get_trip_schedule(?, ?, ?, ?, ?)}");
+        cs.setString(1, lineName);
+        cs.setString(2, startStation);
+        cs.setString(3, endStation);
+        cs.setString(4, dayType);
+        cs.setString(5, direction);
+        ResultSet rs = cs.executeQuery();
+
+        String[] colNames = {"Trip #", "Depart", "Arrive", "Duration (min)"};
+        DefaultTableModel model = new DefaultTableModel(colNames, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        while (rs.next()) {
+            model.addRow(new Object[]{
+                rs.getInt("tripNumber"),
+                rs.getTime("departTime"),
+                rs.getTime("arriveTime"),
+                rs.getInt("tripDurationMinutes")
+            });
+        }
+        return model;
+    }
+
+    private void clearTable(JTable table) {
+        table.setModel(new DefaultTableModel());
     }
 
     private void loadStationDropdowns() {
@@ -902,6 +1011,7 @@ public class CTAClient extends JFrame {
             if (!ok)
                 System.exit(1);
 
+            app.loadStationDropdowns();
             app.setVisible(true);
         });
     }

@@ -73,4 +73,48 @@ BEGIN
   ORDER BY t.arrivalTime;
 END$$
 
+DROP PROCEDURE IF EXISTS sp_get_trip_schedule$$
+CREATE PROCEDURE sp_get_trip_schedule (
+  IN p_lineName VARCHAR(100),
+  IN p_startStation VARCHAR(100),
+  IN p_endStation VARCHAR(100),
+  IN p_dayType VARCHAR(20),
+  IN p_direction VARCHAR(20)
+)
+BEGIN
+  WITH start_times AS (
+    SELECT
+      tt.timeOfDay AS departTime,
+      ROW_NUMBER() OVER (ORDER BY tt.timeOfDay) AS rn
+    FROM TimeTable tt
+    JOIN Line l    ON l.lineID = tt.lineID
+    JOIN Station s ON s.stationID = tt.stationID
+    WHERE l.name = p_lineName
+      AND s.name = p_startStation
+      AND tt.dayType = p_dayType
+      AND tt.direction = p_direction
+  ),
+  end_times AS (
+    SELECT
+      tt.timeOfDay AS arriveTime,
+      ROW_NUMBER() OVER (ORDER BY tt.timeOfDay) AS rn
+    FROM TimeTable tt
+    JOIN Line l    ON l.lineID = tt.lineID
+    JOIN Station s ON s.stationID = tt.stationID
+    WHERE l.name = p_lineName
+      AND s.name = p_endStation
+      AND tt.dayType = p_dayType
+      AND tt.direction = p_direction
+  )
+  SELECT
+    st.rn AS tripNumber,
+    st.departTime,
+    et.arriveTime,
+    TIMESTAMPDIFF(MINUTE, st.departTime, et.arriveTime) AS tripDurationMinutes
+  FROM start_times st
+  JOIN end_times et ON et.rn = st.rn
+  WHERE et.arriveTime > st.departTime
+  ORDER BY st.rn;
+END$$
+
 DELIMITER ;
