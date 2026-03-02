@@ -71,3 +71,22 @@ FROM StationLine sl
 JOIN Line l    ON l.lineID = sl.lineID
 JOIN Station s ON s.stationID = sl.stationID;
 
+
+-- Transfer hubs (stations served by both train and bus, uses INTERSECT set operation)
+CREATE OR REPLACE VIEW v_transfer_hubs AS
+SELECT s.name, GROUP_CONCAT(DISTINCT l.name ORDER BY l.name SEPARATOR ', ') AS linesNames
+FROM Station s
+JOIN StationLine sl ON sl.stationID = s.stationID
+JOIN Line l ON l.lineID = sl.lineID
+WHERE s.name IN (
+    SELECT s1.name FROM Station s1
+    JOIN StationLine sl1 ON sl1.stationID = s1.stationID
+    JOIN Line l1 ON l1.lineID = sl1.lineID WHERE l1.mode = 'train'
+
+    INTERSECT
+
+    SELECT s2.name FROM Station s2
+    JOIN StationLine sl2 ON sl2.stationID = s2.stationID
+    JOIN Line l2 ON l2.lineID = sl2.lineID WHERE l2.mode = 'bus'
+)
+GROUP BY s.name;

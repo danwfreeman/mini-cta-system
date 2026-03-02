@@ -23,6 +23,8 @@ public class TripPlan {
     private JTable scheduleTable2;
     private JLabel scheduleLabel1;
     private JLabel scheduleLabel2;
+    private JLabel statsLabel1;
+    private JLabel statsLabel2;
 
     private JPanel panel;
 
@@ -55,22 +57,26 @@ public class TripPlan {
         planTripButton.addActionListener(e -> onPlanTrip());
 
         JPanel tripTopRow = new JPanel();
+        tripTopRow.add(new JLabel("Start Station:"));
+        tripTopRow.add(startStationDropdown);
+        tripTopRow.add(Box.createHorizontalStrut(20));
+        tripTopRow.add(new JLabel("End Station:"));
+        tripTopRow.add(endStationDropdown);
+        tripTopRow.add(Box.createHorizontalStrut(20));
         tripTopRow.add(new JLabel("Day of Week:"));
         tripTopRow.add(dayOfWeekDropdown);
         tripTopRow.add(Box.createHorizontalStrut(20));
         tripTopRow.add(planTripButton);
 
-        JPanel tripBottomRow = new JPanel();
-        tripBottomRow.add(new JLabel("Start Station:"));
-        tripBottomRow.add(startStationDropdown);
-        tripBottomRow.add(Box.createHorizontalStrut(20));
-        tripBottomRow.add(new JLabel("End Station:"));
-        tripBottomRow.add(endStationDropdown);
-
         JPanel tripPlannerControls = new JPanel();
         tripPlannerControls.setLayout(new BoxLayout(tripPlannerControls, BoxLayout.Y_AXIS));
         tripPlannerControls.add(tripTopRow);
-        tripPlannerControls.add(tripBottomRow);
+
+        JButton transferHubsButton = new JButton("Stations with Bus and Train Service");
+        transferHubsButton.addActionListener(e -> onShowTransferHubs());
+        JPanel transferHubsRow = new JPanel();
+        transferHubsRow.add(transferHubsButton);
+        tripPlannerControls.add(transferHubsRow);
 
         // Schedule tables for trip schedule results
         scheduleTable1 = new JTable();
@@ -80,9 +86,17 @@ public class TripPlan {
 
         scheduleLabel1 = new JLabel(" ");
         scheduleLabel1.setFont(new Font("SansSerif", Font.BOLD, 12));
+        statsLabel1 = new JLabel(" ");
+        statsLabel1.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        JPanel statsPanel1 = new JPanel(new BorderLayout());
+        JLabel statsTitle1 = new JLabel("Summary Stats");
+        statsTitle1.setFont(new Font("SansSerif", Font.BOLD, 16));
+        statsPanel1.add(statsTitle1, BorderLayout.NORTH);
+        statsPanel1.add(statsLabel1, BorderLayout.CENTER);
         JPanel schedulePanel1 = new JPanel(new BorderLayout());
         schedulePanel1.add(scheduleLabel1, BorderLayout.NORTH);
         schedulePanel1.add(scheduleScroll1, BorderLayout.CENTER);
+        schedulePanel1.add(statsPanel1, BorderLayout.SOUTH);
 
         scheduleTable2 = new JTable();
         JTableHeader sched2Header = scheduleTable2.getTableHeader();
@@ -91,9 +105,17 @@ public class TripPlan {
 
         scheduleLabel2 = new JLabel(" ");
         scheduleLabel2.setFont(new Font("SansSerif", Font.BOLD, 12));
+        statsLabel2 = new JLabel(" ");
+        statsLabel2.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        JPanel statsPanel2 = new JPanel(new BorderLayout());
+        JLabel statsTitle2 = new JLabel("Summary Stats");
+        statsTitle2.setFont(new Font("SansSerif", Font.BOLD, 16));
+        statsPanel2.add(statsTitle2, BorderLayout.NORTH);
+        statsPanel2.add(statsLabel2, BorderLayout.CENTER);
         JPanel schedulePanel2 = new JPanel(new BorderLayout());
         schedulePanel2.add(scheduleLabel2, BorderLayout.NORTH);
         schedulePanel2.add(scheduleScroll2, BorderLayout.CENTER);
+        schedulePanel2.add(statsPanel2, BorderLayout.SOUTH);
 
         // Side-by-side schedule tables panel
         JSplitPane scheduleSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, schedulePanel1, schedulePanel2);
@@ -155,6 +177,10 @@ public class TripPlan {
         userSplitPane.setDividerLocation(1500);
 
         panel = new JPanel(new BorderLayout());
+        JLabel titleLabel = new JLabel("<html><div style='text-align: center;'>Welcome to the CTA Trip planner<br>Plan your next trip now</div></html>");
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        titleLabel.setHorizontalAlignment(JLabel.CENTER);
+        panel.add(titleLabel, BorderLayout.NORTH);
         panel.add(userSplitPane, BorderLayout.CENTER);
     }
 
@@ -245,6 +271,7 @@ public class TripPlan {
                 loadTripSchedule(lineName, startStation, endStation, dayType, "northbound", scheduleTable1, scheduleLabel1);
                 clearTable(scheduleTable2);
                 scheduleLabel2.setText(" ");
+                statsLabel2.setText(" ");
                 return;
             }
 
@@ -325,9 +352,35 @@ public class TripPlan {
             }
             targetTable.setModel(model);
             infoLabel.setText(lineName + "  |  " + startStation + " → " + endStation + "  |  " + usedDirection);
+            // Load summary stats for this leg
+            JLabel statsLabel = (targetTable == scheduleTable1) ? statsLabel1 : statsLabel2;
+            loadTripStats(lineName, startStation, endStation, dayType, usedDirection, statsLabel);
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(parent, "Error loading trip schedule: " + ex.getMessage(), "Error",
                     JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void loadTripStats(String lineName, String startStation, String endStation,
+                                String dayType, String direction, JLabel statsLabel) {
+        try {
+            CallableStatement cs = conn.prepareCall("{CALL sp_get_trip_stats(?, ?, ?, ?, ?)}");
+            cs.setString(1, lineName);
+            cs.setString(2, startStation);
+            cs.setString(3, endStation);
+            cs.setString(4, dayType);
+            cs.setString(5, direction);
+            ResultSet rs = cs.executeQuery();
+            if (rs.next()) {
+                double avg = rs.getDouble("avgTripMinutes");
+                int min = rs.getInt("minTripMinutes");
+                int max = rs.getInt("maxTripMinutes");
+                statsLabel.setText(String.format("Avg: %.1f min  |  Min: %d min  |  Max: %d min", avg, min, max));
+            } else {
+                statsLabel.setText("No stats available");
+            }
+        } catch (SQLException ex) {
+            statsLabel.setText("Error loading stats");
         }
     }
 
@@ -369,6 +422,27 @@ public class TripPlan {
             LineDetail.renderLineDetail(targetPanel, rs, lineName);
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(parent, "Error loading line detail: " + ex.getMessage(), "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void onShowTransferHubs() {
+        try {
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM v_transfer_hubs");
+            String[] colNames = {"Station Name", "Lines"};
+            DefaultTableModel model = new DefaultTableModel(colNames, 0) {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
+            };
+            while (rs.next()) {
+                model.addRow(new Object[]{rs.getString("name"), rs.getString("linesNames")});
+            }
+            tripResultTable.setModel(model);
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(parent, "Error loading transfer hubs: " + ex.getMessage(), "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
     }
