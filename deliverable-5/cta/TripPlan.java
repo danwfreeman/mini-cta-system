@@ -120,15 +120,15 @@ public class TripPlan {
         schedulePanel2.add(scheduleScroll2, BorderLayout.CENTER);
         schedulePanel2.add(statsPanel2, BorderLayout.SOUTH);
 
-        // Side-by-side schedule tables panel
+        // Side by side schedule tables panel
         JSplitPane scheduleSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, schedulePanel1, schedulePanel2);
         scheduleSplitPane.setResizeWeight(0.5);
 
-        // Trip result table top 40%, schedule tables bottom 60%
+        // Trip result table top, schedule tables bottom
         JSplitPane tripContentSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, tripResultScroll, scheduleSplitPane);
         tripContentSplit.setResizeWeight(0.4);
 
-        // Left side: trip planner controls + trip content (table + schedules)
+        // Left side: trip planner controls and trip content 
         JPanel tripPlannerPanel = new JPanel(new BorderLayout());
         tripPlannerPanel.add(tripPlannerControls, BorderLayout.NORTH);
         tripPlannerPanel.add(tripContentSplit, BorderLayout.CENTER);
@@ -162,7 +162,7 @@ public class TripPlan {
         transferLineDetailPanel.setLayout(new BoxLayout(transferLineDetailPanel, BoxLayout.Y_AXIS));
         JScrollPane transferLineDetailScroll = new JScrollPane(transferLineDetailPanel);
 
-        // Left side: first line detail + transfer line detail stacked vertically
+        // first line detail and transfer line detail stacked
         JPanel firstLinePanel = new JPanel(new BorderLayout());
         firstLinePanel.add(lineDetailRow, BorderLayout.NORTH);
         firstLinePanel.add(lineDetailScroll, BorderLayout.CENTER);
@@ -174,7 +174,7 @@ public class TripPlan {
         JSplitPane linesSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, firstLinePanel, secondLinePanel);
         linesSplitPane.setResizeWeight(0.5);
 
-        // User split pane: left = trip planner, right = line details
+        // User pane left is the  trip planner and right are the line details
         JSplitPane userSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tripPlannerPanel, linesSplitPane);
         userSplitPane.setResizeWeight(0.75);
         userSplitPane.setDividerLocation(1500);
@@ -249,7 +249,7 @@ public class TripPlan {
             directCs.setString(2, endStation);
             ResultSet rs = directCs.executeQuery();
             if (rs.isBeforeFirst()) {
-                // Use the first shared line for a clean 2-row display
+                // Use the first shared line for a 2 row only display
                 rs.next();
                 String lineName = rs.getString("lineName");
                 model.addRow(new Object[]{"Start Station", startStation, lineName});
@@ -317,12 +317,11 @@ public class TripPlan {
         };
     }
 
-    private void loadTripSchedule(String lineName, String startStation, String endStation,
-                                   String dayType, String direction, JTable targetTable, JLabel infoLabel) {
+    private void loadTripSchedule(String lineName, String startStation, String endStation, String dayType, String direction, JTable targetTable, JLabel infoLabel) {
         try {
             String usedDirection = direction;
             DefaultTableModel model = callTripSchedule(lineName, startStation, endStation, dayType, usedDirection);
-            // If no results, flip direction and retry
+            // If no results, flip the direction and retry again (only 2 possible directions here, north and south)
             if (model.getRowCount() == 0) {
                 usedDirection = direction.equals("northbound") ? "southbound" : "northbound";
                 model = callTripSchedule(lineName, startStation, endStation, dayType, usedDirection);
