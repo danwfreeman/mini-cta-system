@@ -120,7 +120,7 @@ END$$
 
 
 -- Find a direct route: a line that serves both start and end stations
--- Uses relational division pattern with GROUP BY + HAVING COUNT(DISTINCT) = 2
+-- Uses relational division pattern with GROUP BY and HAVING COUNT(DISTINCT) = 2
 DROP PROCEDURE IF EXISTS sp_find_direct_route$$
 CREATE PROCEDURE sp_find_direct_route (
   IN p_startStation VARCHAR(100),
