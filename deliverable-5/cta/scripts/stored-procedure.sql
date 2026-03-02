@@ -118,4 +118,49 @@ BEGIN
   FROM trip_durations;
 END$$
 
+
+-- Find a direct route: a line that serves both start and end stations
+-- Uses relational division pattern with GROUP BY + HAVING COUNT(DISTINCT) = 2
+DROP PROCEDURE IF EXISTS sp_find_direct_route$$
+CREATE PROCEDURE sp_find_direct_route (
+  IN p_startStation VARCHAR(100),
+  IN p_endStation VARCHAR(100)
+)
+BEGIN
+  SELECT l.name AS lineName
+  FROM Line l
+  JOIN StationLine sl ON sl.lineID = l.lineID
+  JOIN Station s ON s.stationID = sl.stationID
+  WHERE s.name IN (p_startStation, p_endStation)
+  GROUP BY l.lineID, l.name
+  HAVING COUNT(DISTINCT s.name) = 2;
+END$$
+
+
+-- Find a one-transfer route between two stations via a shared transfer station
+-- Uses set membership (IN subquery) to find lines serving each station
+DROP PROCEDURE IF EXISTS sp_find_transfer_route$$
+CREATE PROCEDURE sp_find_transfer_route (
+  IN p_startStation VARCHAR(100),
+  IN p_endStation VARCHAR(100)
+)
+BEGIN
+  SELECT DISTINCT s.name AS transferStation, l1.name AS takeLine, l2.name AS transferToLine
+  FROM Station s
+  JOIN StationLine slA ON slA.stationID = s.stationID
+  JOIN StationLine slB ON slB.stationID = s.stationID
+  JOIN Line l1 ON l1.lineID = slA.lineID
+  JOIN Line l2 ON l2.lineID = slB.lineID
+  WHERE slA.lineID IN (
+      SELECT sl.lineID FROM StationLine sl
+      JOIN Station st ON st.stationID = sl.stationID WHERE st.name = p_startStation
+  )
+  AND slB.lineID IN (
+      SELECT sl.lineID FROM StationLine sl
+      JOIN Station st ON st.stationID = sl.stationID WHERE st.name = p_endStation
+  )
+  AND slA.lineID <> slB.lineID
+  AND s.name NOT IN (p_startStation, p_endStation);
+END$$
+
 DELIMITER ;

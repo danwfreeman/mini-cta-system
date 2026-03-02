@@ -74,8 +74,11 @@ public class TripPlan {
 
         JButton transferHubsButton = new JButton("Stations with Bus and Train Service");
         transferHubsButton.addActionListener(e -> onShowTransferHubs());
+        JButton accessibleLinesButton = new JButton("Most Accessible Lines");
+        accessibleLinesButton.addActionListener(e -> onShowMostAccessibleLines());
         JPanel transferHubsRow = new JPanel();
         transferHubsRow.add(transferHubsButton);
+        transferHubsRow.add(accessibleLinesButton);
         tripPlannerControls.add(transferHubsRow);
 
         // Schedule tables for trip schedule results
@@ -239,19 +242,12 @@ public class TripPlan {
             };
 
             // simple case, there is one line that serves both start and end station, show and return
-            // self join pattern to find lines that have both stations, group by line and count distinct stations to ensure both are served by the same line
-            // this is a relational division pattern, find entities related to all of a set (two stations in this case)
-            String directSql = "SELECT l.name AS lineName " +
-                    "FROM Line l " +
-                    "JOIN StationLine sl ON sl.lineID = l.lineID " +
-                    "JOIN Station s ON s.stationID = sl.stationID " +
-                    "WHERE s.name IN (?, ?) " +
-                    "GROUP BY l.lineID, l.name " +
-                    "HAVING COUNT(DISTINCT s.name) = 2";
-            PreparedStatement pstmt = conn.prepareStatement(directSql);
-            pstmt.setString(1, startStation);
-            pstmt.setString(2, endStation);
-            ResultSet rs = pstmt.executeQuery();
+            // uses sp_find_direct_route stored procedure
+            // relational division pattern, find entities related to all of a set (two stations in this case)
+            CallableStatement directCs = conn.prepareCall("{CALL sp_find_direct_route(?, ?)}");
+            directCs.setString(1, startStation);
+            directCs.setString(2, endStation);
+            ResultSet rs = directCs.executeQuery();
             if (rs.isBeforeFirst()) {
                 // Use the first shared line for a clean 2-row display
                 rs.next();
@@ -276,31 +272,12 @@ public class TripPlan {
             }
 
             // no direct route, check if we have a shared station between 2 lines (1 transfer only)
-            // if s.name exists and the lines are different, and the name is not that same as the start or end name (station), then we are good
-            // this would be a set membership query using IN
-            // this enforces 1 transfer because we are looking at one station to server 2 distinct lines
-            String transferSql = "SELECT DISTINCT s.name AS transferStation, l1.name AS takeLine, l2.name AS transferToLine " +
-                    "FROM Station s " +
-                    "JOIN StationLine slA ON slA.stationID = s.stationID " +
-                    "JOIN StationLine slB ON slB.stationID = s.stationID " +
-                    "JOIN Line l1 ON l1.lineID = slA.lineID " +
-                    "JOIN Line l2 ON l2.lineID = slB.lineID " +
-                    "WHERE slA.lineID IN ( " +
-                    "    SELECT sl.lineID FROM StationLine sl " +
-                    "    JOIN Station st ON st.stationID = sl.stationID WHERE st.name = ? " +
-                    ") " +
-                    "AND slB.lineID IN ( " +
-                    "    SELECT sl.lineID FROM StationLine sl " +
-                    "    JOIN Station st ON st.stationID = sl.stationID WHERE st.name = ? " +
-                    ") " +
-                    "AND slA.lineID <> slB.lineID " +
-                    "AND s.name NOT IN (?, ?) ";
-            PreparedStatement pstmt2 = conn.prepareStatement(transferSql);
-            pstmt2.setString(1, startStation);
-            pstmt2.setString(2, endStation);
-            pstmt2.setString(3, startStation);
-            pstmt2.setString(4, endStation);
-            ResultSet rs2 = pstmt2.executeQuery();
+            // uses sp_find_transfer_route stored procedure (set membership query using IN)
+            // this enforces 1 transfer because we are looking at one station to serve 2 distinct lines
+            CallableStatement transferCs = conn.prepareCall("{CALL sp_find_transfer_route(?, ?)}");
+            transferCs.setString(1, startStation);
+            transferCs.setString(2, endStation);
+            ResultSet rs2 = transferCs.executeQuery();
             if (rs2.isBeforeFirst()) {
                 // we force 4 lines here, since we know we have a start, transfer from, transfer to, and end station, basically duplicating the transfer station for to/from clarity for display purposes
                 rs2.next();
@@ -422,6 +399,31 @@ public class TripPlan {
             LineDetail.renderLineDetail(targetPanel, rs, lineName);
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(parent, "Error loading line detail: " + ex.getMessage(), "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void onShowMostAccessibleLines() {
+        try {
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM v_most_accessible_lines");
+            String[] colNames = {"Line", "Accessible Stations Count", "Accessible Stations Names"};
+            DefaultTableModel model = new DefaultTableModel(colNames, 0) {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
+            };
+            while (rs.next()) {
+                model.addRow(new Object[]{
+                    rs.getString("name"),
+                    rs.getInt("accessibleCount"),
+                    rs.getString("accessibleStations")
+                });
+            }
+            tripResultTable.setModel(model);
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(parent, "Error loading most accessible lines: " + ex.getMessage(), "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
     }

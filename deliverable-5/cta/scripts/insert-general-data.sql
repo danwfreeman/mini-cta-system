@@ -25,7 +25,7 @@ INSERT INTO Line (lineID, name, mode) VALUES
 INSERT INTO Station (stationID, name, mode, isAccessible) VALUES
 (1001, 'Howard',            'train', FALSE),
 (1002, 'Belmont',           'train', TRUE),
-(1003, 'Fullerton',         'train', FALSE),
+(1003, 'Fullerton',         'train', TRUE),
 (1004, 'Jackson',           'train', TRUE),
 (1005, 'Roosevelt',         'train', TRUE),
 (1006, 'Clark/Lake',        'train', FALSE),
