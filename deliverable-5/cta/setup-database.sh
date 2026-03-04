@@ -14,8 +14,6 @@ echo "Inserting general data...enter to continue (blank password)"
 mysql -u root -p < ./scripts/insert-general-data.sql;
 echo "Inserting schedule data...enter to continue (blank password)"
 mysql -u root -p < ./scripts/insert-schedule-data.sql;
-echo "Creating functions...enter to continue (blank password)"
-mysql -u root -p < ./scripts/functions.sql;
 echo "Creating stored procedures...enter to continue (blank password)"
 mysql -u root -p < ./scripts/stored-procedure.sql;
 

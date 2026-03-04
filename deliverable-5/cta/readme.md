@@ -6,10 +6,10 @@ From the website https://www.transitchicago.com/ this program has created sample
 - Planning Trips
 - Viewing 'Hub' stations
 - Viewing Most Accessible Lines
-- Viewing fares
-- Viewing system alerts (system wide, by station, by line)
+- Viewing/Creating fares
+- Viewing/Creating system alerts (system wide, by station, by line)
 - Viewing all stops on a particular line
-- Viewing train wait times between arrivals for a 2-hour window (by line/station/day/direction)
+- Viewing train/bus wait times between arrivals (by line/station/day/direction)
 
 ### Setup 
 - install [MySQL Workbench](https://www.mysql.com/products/workbench/)

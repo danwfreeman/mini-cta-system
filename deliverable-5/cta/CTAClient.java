@@ -242,22 +242,42 @@ public class CTAClient extends JFrame {
         centerCards.add(resultScroll, "admin");
         centerCards.add(tripPlan.getPanel(), "user");
 
-        // CardLayout to swap between admin and user top controls
-        CardLayout roleCardLayout = new CardLayout();
+        // CardLayout that sizes to the currently visible card only
+        CardLayout roleCardLayout = new CardLayout() {
+            @Override
+            public Dimension preferredLayoutSize(Container parent) {
+                Component current = null;
+                for (Component comp : parent.getComponents()) {
+                    if (comp.isVisible()) { current = comp; break; }
+                }
+                if (current != null) {
+                    Insets insets = parent.getInsets();
+                    Dimension d = current.getPreferredSize();
+                    return new Dimension(d.width + insets.left + insets.right,
+                                         d.height + insets.top + insets.bottom);
+                }
+                return super.preferredLayoutSize(parent);
+            }
+        };
         JPanel roleCards = new JPanel(roleCardLayout);
         roleCards.add(adminPanel, "admin");
 
         // Empty placeholder for user (controls are in the split pane)
         JPanel userTopPlaceholder = new JPanel();
+        userTopPlaceholder.setPreferredSize(new Dimension(0, 0));
         roleCards.add(userTopPlaceholder, "user");
 
         adminRadio.addActionListener(e2 -> {
             roleCardLayout.show(roleCards, "admin");
+            roleCards.revalidate();
+            roleCards.repaint();
             centerCardLayout.show(centerCards, "admin");
             onShowFares(null);
         });
         userRadio.addActionListener(e2 -> {
             roleCardLayout.show(roleCards, "user");
+            roleCards.revalidate();
+            roleCards.repaint();
             centerCardLayout.show(centerCards, "user");
             tripPlan.loadLineDropdown();
             tripPlan.loadStationDropdowns();
