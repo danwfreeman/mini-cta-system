@@ -180,7 +180,7 @@ public class TripPlan {
         userSplitPane.setDividerLocation(1500);
 
         panel = new JPanel(new BorderLayout());
-        JLabel titleLabel = new JLabel("<html><div style='text-align: center;'>Welcome to the CTA Trip planner<br>Plan your next trip now</div></html>");
+        JLabel titleLabel = new JLabel("<html><div style='text-align: center;'>CTA Trip planner<br>Plan your next trip now</div></html>");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
         titleLabel.setHorizontalAlignment(JLabel.CENTER);
         panel.add(titleLabel, BorderLayout.NORTH);

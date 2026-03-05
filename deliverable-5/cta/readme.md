@@ -22,7 +22,7 @@ From the website https://www.transitchicago.com/ this program has created sample
 - unzip cta.zip to a directory, eg './cta'
 - from within the root of './cta', run database setup scripts:
     - run `./setup-database.sh` (prompts for login, password is 'blank')
-    - will prompt for the password 9 times, hit enter for each
+    - will prompt for the password 8 times, hit enter for each
     - database will be created and populated with data
 
 
@@ -39,6 +39,9 @@ From the website https://www.transitchicago.com/ this program has created sample
 
 
 ### Final Summation
+
+#### Loom Video Walkthrough
+https://www.loom.com/share/7de6bdd83bc84bcbae8187132ed4242e
 
 #### User Trip Planner Screen: (deliverable #5)
 This new panel in the Java Swing application gives users the ability to plan a trip via combinations of train or bus between 2 stations.
@@ -80,7 +83,7 @@ when querying for the time data, if there is no data in the inital query (based 
 
 - SQL Function - Advanced Aggregate:
     - `sp_find_direct_route` in `./scripts/stored-procedure.sql`
-        - summary: This is a relational division pattern, we group by line and make sure that each line has ALL the required stations (this 'all' is the divisional key, and the implementation is the: `HAVING COUNT(DISTINCT s.name) = 2;` clause.  It uses a set filter with `IN` to restrict to only the stations we're interested in (start/end stations).  The having clause is also the 'advanced aggregate' part (`count distinct`) and enforces that the line has 2 and the only 2 stations we are interested in, thusly guaranting that this line services both stations.
+        - summary: This is a relational division pattern, we group by line and make sure that each line has ALL the required stations - this 'all' is the divisional key, and the implementation is the: `HAVING COUNT(DISTINCT s.name) = 2;` clause.  It uses a set filter with `IN` to restrict to only the stations we're interested in (start/end stations).  The having clause is also the 'advanced aggregate' part (`count distinct`) and enforces that the line has 2 and the only 2 stations we are interested in, thusly guaranting that this line services both stations.
         Side note, because the `count` appears after the `HAVING` clause it is evaluated after grouping, that is key for this to work.
 
 - SQL Function - OLAP:
